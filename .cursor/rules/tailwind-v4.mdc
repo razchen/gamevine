@@ -1,0 +1,65 @@
+---
+description: Tailwind CSS v4 — CSS-first config. No tailwind.config.js.
+globs: apps/web/**
+alwaysApply: false
+---
+
+# Tailwind CSS v4
+
+## CSS-first configuration
+
+Tailwind v4 is configured in **CSS**, not JS. The single source of truth is `apps/web/src/app/globals.css`. There is no `tailwind.config.js` / `.ts` in this repo — do not create one.
+
+Key pieces of `globals.css`:
+
+```css
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  /* ...design tokens as CSS custom properties... */
+}
+```
+
+- `@import "tailwindcss"` replaces the old `@tailwind base/components/utilities` trio.
+- `@theme` (or `@theme inline`) defines design tokens that Tailwind compiles into utility classes. `--color-primary` → `bg-primary`, `text-primary`, `border-primary`, etc.
+- `@custom-variant dark (&:is(.dark *))` enables class-based dark mode. Toggling `.dark` on a root element flips the palette via the `:root` / `.dark` CSS variable overrides.
+- Color tokens use `oklch()`. Keep new tokens in the same color space unless there's a reason not to.
+
+## PostCSS
+
+`apps/web/postcss.config.mjs` uses `@tailwindcss/postcss`. Do not add `autoprefixer` or `postcss-preset-env` — Tailwind v4 handles vendor prefixing internally.
+
+## Class order
+
+`prettier-plugin-tailwindcss` is installed and sorts classes on format. Don't fight it — run `pnpm format` before committing. Class order is not a stylistic preference here, it's automated.
+
+## shadcn/ui
+
+The UI library is shadcn. Components live in `apps/web/src/components/ui/**` and are generated / owned by this repo (not a node_modules dependency). When adding a shadcn component, use the CLI conventions shadcn prescribes (or copy a peer component and adapt). Use `cn` from `apps/web/src/lib/utils.ts` to merge classes.
+
+## CVA for variants
+
+Use `class-variance-authority` (`cva`) for component variants rather than ad-hoc conditional class maps. Pattern:
+
+```tsx
+const buttonVariants = cva('base classes', {
+  variants: {
+    size: { sm: 'h-8 px-3', md: 'h-10 px-4', lg: 'h-12 px-6' },
+    tone: { primary: 'bg-primary', ghost: 'bg-transparent' },
+  },
+  defaultVariants: { size: 'md', tone: 'primary' },
+});
+```
+
+## Forbidden
+
+- Creating `tailwind.config.js` or `tailwind.config.ts` in `apps/web/`.
+- `@tailwind base; @tailwind components; @tailwind utilities;` — that's v3 syntax. Use `@import "tailwindcss";`.
+- Inline `style={{ color: '...' }}` where a utility class or design token exists.
+- Hex colors sprinkled in JSX. Use the `--color-*` tokens defined in `globals.css`.
+- Ad-hoc `if (x) className += ...` string concatenation. Use `cn()` or `cva`.

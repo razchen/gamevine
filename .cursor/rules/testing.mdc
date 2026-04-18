@@ -1,0 +1,51 @@
+---
+description: Testing conventions for Jest specs across both apps.
+globs: **/*.spec.ts,**/*.spec.tsx,**/*.test.ts,**/*.test.tsx
+alwaysApply: false
+---
+
+# Testing
+
+Both apps use **Jest**. Specs are colocated next to the source.
+
+## Locations and naming
+
+- `apps/api`: Jest `rootDir` is `src` and `testRegex` is `.*\.spec\.ts$` (see `apps/api/package.json`). Place specs at `apps/api/src/**/<name>.spec.ts`.
+- `apps/web`: Jest runs from package root with `--passWithNoTests` today; colocate as `apps/web/src/**/<name>.test.ts(x)` or `<name>.spec.ts(x)`.
+- Integration / e2e for api lives under `apps/api/test/` and runs via `pnpm --filter @gamevine/api test:e2e` using `supertest`.
+
+One spec per source file, same basename. A source file without a corresponding spec is a coverage gap — the `test-runner` subagent will flag it.
+
+## What to test
+
+- **Pure functions**: exhaustive edge cases. Happy, empty, boundary, error.
+- **Nest services**: prefer integration tests (real Drizzle against a test DB container) over deep mocking. Mock only at the network boundary.
+- **Nest controllers**: `supertest` against a compiled `NestFactory.createTestingModule`. Test validation rejection (Zod) as much as happy paths.
+- **Shared** (`packages/shared`): every exported function / schema has a spec. These are the contracts both apps depend on.
+- **Web components**: test behaviour, not implementation. Prefer React Testing Library queries by role/text over test ids.
+
+## Forbidden
+
+- `.skip`, `.only`, `xit`, `xdescribe`, `fdescribe`, `fit` in committed code.
+- `--passWithNoTests` is a bootstrap crutch. Once a package has any tests, this flag is tolerated but should be removed when all src files have coverage.
+- Snapshot tests of entire React trees. Small, targeted snapshots only (and only when no better assertion exists).
+- Mocking `@gamevine/shared`. It's a plain module; import it directly.
+- Tests that hit the network. Use `nock`, MSW, or the supertest `Express` instance.
+
+## Test data
+
+- Shared fake factories go in `apps/<app>/test/factories/` (create if they don't exist). Don't inline ad-hoc fixtures in more than one spec.
+- DB-touching tests get a fresh transaction per test and roll back (Nest + Drizzle pattern — write it once in a `TestDbModule` and reuse).
+
+## Running
+
+```bash
+pnpm test                                    # everything via turbo
+pnpm --filter @gamevine/api test             # api unit
+pnpm --filter @gamevine/api test:e2e         # api e2e (needs Postgres)
+pnpm --filter @gamevine/web test             # web unit
+pnpm --filter @gamevine/api test:watch       # TDD loop
+pnpm --filter @gamevine/api test:cov         # coverage report
+```
+
+Before claiming done, the full `pnpm test` must be green from root. See `.cursor/rules/definition-of-done.mdc`.

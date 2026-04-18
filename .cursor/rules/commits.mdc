@@ -1,0 +1,51 @@
+---
+description: Git, commit, and branch conventions.
+alwaysApply: true
+---
+
+# Commits and Git Hygiene
+
+## Commit messages
+
+Use [Conventional Commits](https://www.conventionalcommits.org/). Minimum form:
+
+```
+<type>(<scope>): <subject>
+```
+
+- **type**: `feat`, `fix`, `chore`, `refactor`, `test`, `docs`, `perf`, `build`, `ci`, `revert`.
+- **scope** (optional but preferred): package name without the org prefix — `web`, `api`, `shared`, `root`, `deps`, `ci`.
+- **subject**: imperative mood, lowercase, no trailing period, <=72 chars.
+
+Examples:
+- `feat(api): add /games/:id/invite endpoint`
+- `fix(web): await params in route handlers`
+- `chore(deps): bump drizzle-orm to 0.46`
+- `refactor(shared): extract Game type from api`
+
+Body (optional) explains *why*. Wrap at 80 chars. Reference issues/PRs at the bottom.
+
+## Branches
+
+- `main` is protected. No direct pushes, no force pushes, ever.
+- Feature branches: `<type>/<short-kebab>` — e.g. `feat/game-invitations`, `fix/web-params-await`.
+- Keep branches short-lived. Rebase on `main` before opening a PR if it's more than a day old.
+
+## Pull requests
+
+- Title = commit-message style (`feat(web): add leaderboard page`).
+- Body must cover: what changed, why, how it was verified (commands run, browser paths exercised). Link the Sentry issue or ticket if applicable.
+- Screenshots / gifs for any UI change. Non-negotiable.
+- Run the gauntlet locally before opening: `pnpm typecheck && pnpm lint && pnpm test`.
+
+## Forbidden
+
+- `--no-verify` on commit or push. If a hook is failing, fix the cause.
+- `git push --force` (only `--force-with-lease` is ever acceptable, and never against `main`).
+- `git commit --amend` after pushing to a shared branch.
+- Committing generated files that belong in `.gitignore` (dist, `.next`, coverage, `.turbo`).
+- Committing secrets. If you suspect you did, rotate immediately.
+
+## Squash or merge?
+
+Prefer squash-merging feature branches into `main` so history stays linear and each merged unit is one revertable commit. Use merge commits only for long-lived branches that deserve their full history.

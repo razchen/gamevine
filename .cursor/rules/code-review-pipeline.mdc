@@ -1,0 +1,69 @@
+---
+description: Mandatory pipeline for reviewing existing code (diffs, PRs, branches) without implementing.
+alwaysApply: true
+---
+
+# Code Review Pipeline
+
+When asked to **review** existing code (not implement), run these agents sequentially. This is the review-mode counterpart to `.cursor/rules/agent-pipeline.mdc`.
+
+## When this applies
+
+Use this pipeline when the user asks you to:
+
+- Review a diff or branch against `main`.
+- Review a PR (local or on GitHub).
+- "Look over" or "check" existing changes.
+- Audit a file or module for issues.
+- Any request where you're **not** writing the code yourself.
+
+## When NOT to use this
+
+Use the full implementation pipeline (`.cursor/rules/agent-pipeline.mdc`) when:
+
+- Implementing a new feature.
+- Fixing a bug (you're writing the fix).
+- Making any code changes yourself.
+
+## Required agents (run in order)
+
+| Step | Agent | Condition |
+|------|-------|-----------|
+| 1 | `code-reviewer` | Always |
+| 2 | `react-perf-reviewer` | If the diff touches any `.tsx` / `.jsx` file |
+| 3 | `dry-checker` | Always — new code often duplicates existing utilities |
+| 4 | `schema-sync` | If the diff touches `packages/shared/**` or `apps/api/**/*.schema.ts` |
+| 5 | `security-auditor` | If the diff touches auth, API routes, env handling, or DB queries |
+
+## Agents to skip in review-only mode
+
+Unless the user explicitly asks for them:
+
+- `test-runner` — user can request separately; running tests for a review is often noise.
+- `lint-typecheck-fixer` — the user hasn't asked you to change code; flag lint/type issues through `code-reviewer` instead.
+- `e2e-smoke` — reviewer doesn't own the change.
+- Scaffolders (`nest-feature`, `web-route`) — not applicable.
+- `drizzle-migrations` — review the SQL inline via `code-reviewer` instead.
+
+## Reporting
+
+At the end, produce a consolidated verdict: **APPROVE**, **REQUEST CHANGES**, or **NEEDS DISCUSSION**. List findings by severity (Critical / High / Medium / Low), each citing file and line. If any agent returned non-trivial findings, surface them verbatim — do not paraphrase away severity.
+
+## Non-negotiable rules
+
+- Agent recommendations are **not optional**. If `code-reviewer` flags an O(n²), that's a real finding, not a suggestion to ignore.
+- Do not water down findings to be polite. The user asked for a review, not validation.
+- If you disagree with a finding, state it, give your specific technical objection, and ask the user to decide. Do not silently omit it.
+
+## Example invocation
+
+User: "Review the diff against main."
+
+```
+1. code-reviewer        → quality, performance, correctness, patterns
+2. react-perf-reviewer  → IF .tsx/.jsx in diff
+3. dry-checker          → find duplications in new code
+4. schema-sync          → IF packages/shared/** or schemas changed
+5. security-auditor     → IF auth/API/env/DB touched
+→ Consolidated verdict with severity-sorted findings
+```

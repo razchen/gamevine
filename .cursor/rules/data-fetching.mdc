@@ -1,0 +1,84 @@
+---
+description: Client-side data fetching via TanStack Query + shared axios instance.
+globs: apps/web/**/*.ts,apps/web/**/*.tsx
+alwaysApply: false
+---
+
+# Web Data Fetching
+
+## Server first, then client
+
+- Server Components fetch directly with `fetch` (or by calling a server-side helper). No React Query on the server.
+- TanStack Query is for **client components** that need caching, revalidation, optimistic updates, or live state.
+- Route Handlers under `apps/web/src/app/**/route.ts` are server-side — fetch from your server-side helpers, not the axios client.
+
+## The shared axios instance
+
+One instance, in `apps/web/src/lib/api.ts`:
+
+```ts
+export const api: AxiosInstance = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001',
+  timeout: 10_000,
+  withCredentials: true,
+});
+```
+
+- Never `import axios from 'axios'` and call methods directly in feature code — always go through `api`.
+- Helpers returning typed responses live next to `api.ts` or in `apps/web/src/lib/<feature>/api.ts`. They return the decoded body, not an `AxiosResponse`.
+- Shared contract types come from `@gamevine/shared` — see `fetchHealth()` using `HealthResponse` and `API_HEALTH_PATH`.
+
+## TanStack Query conventions
+
+Query setup is already done in `apps/web/src/app/providers.tsx`: client-side `QueryClient` with `staleTime: 30_000`, `refetchOnWindowFocus: false`, devtools in dev. Don't rebuild this elsewhere.
+
+### Keys
+
+Query keys are **tuples** and colocate with the hook that uses them:
+
+```ts
+// apps/web/src/lib/games/hooks.ts
+export const gamesKeys = {
+  all: ['games'] as const,
+  list: (filter: string) => ['games', 'list', filter] as const,
+  detail: (id: string) => ['games', 'detail', id] as const,
+};
+
+export function useGame(id: string) {
+  return useQuery({
+    queryKey: gamesKeys.detail(id),
+    queryFn: () => fetchGame(id),
+  });
+}
+```
+
+- Keep keys stable and serializable (strings, numbers, plain objects).
+- Use a `keys` object per feature so invalidation is explicit: `queryClient.invalidateQueries({ queryKey: gamesKeys.all })`.
+
+### Mutations
+
+Use `useMutation` with `onSuccess` / `onError` for cache updates. Prefer `queryClient.invalidateQueries` over hand-written cache writes unless you have a specific reason.
+
+### Optimistic updates
+
+Use `useOptimistic` (React 19) for form-local optimism. Use TanStack Query's `onMutate` / `onError` / `onSettled` pattern for cache-wide optimism across multiple components.
+
+## When NOT to use React Query
+
+- Server Components: fetch directly.
+- One-shot form submission without caching: a plain `api.post(...)` inside the submit handler is fine.
+- WebSockets / SSE: TanStack Query is not the right hammer. Use a dedicated client + a `useSyncExternalStore`.
+
+## Forbidden
+
+- Creating a second axios instance in a feature file.
+- Raw `fetch` in a client component when a query hook would cache the result usefully.
+- React Query on the server (Server Components, Route Handlers).
+- Ad-hoc string keys (`useQuery({ queryKey: 'games' })`) — always tuples.
+- `refetchOnWindowFocus: true` on new queries without a product reason.
+- Turning devtools on in production.
+
+## Errors
+
+- Axios errors surface as `AxiosError<ServerErrorShape>`. Decode `err.response?.data` against a Zod schema before trusting it.
+- Query errors bubble to `ErrorBoundary` via `throwOnError: true` **only** when you have a route-level `error.tsx`. Otherwise handle in-component.

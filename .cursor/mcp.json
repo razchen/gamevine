@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"],
+      "description": "Upstream library docs. Used by the docs-first rule and the next16-docs subagent.",
+      "env": {}
+    },
+    "postgres": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "${env:DATABASE_URL}"
+      ],
+      "description": "Local Postgres for drizzle-migrations and debugging. Reads DATABASE_URL from the user env (same var the api uses, see apps/api/src/config/env.validation.ts).",
+      "env": {}
+    }
+  }
+}

@@ -1,0 +1,57 @@
+---
+description: Purity rules for packages/shared — the cross-app contract surface.
+globs: packages/shared/**
+alwaysApply: false
+---
+
+# `@gamevine/shared` — purity
+
+This package is the **contract** between the web and api apps. It is consumed by Next.js (browser + server) and NestJS (Node). That imposes hard constraints.
+
+## Must
+
+- Be **runtime-free where possible**. Prefer types, interfaces, string literal unions, and const objects. Side-effect imports are forbidden at module load.
+- All exports flow through `packages/shared/src/index.ts`. If it's not re-exported from there, the apps can't reach it.
+- Be **deterministic**. Given the same inputs, a function here returns the same outputs with no external state.
+- Be **isomorphic**. Code must work unchanged in both Node and the browser.
+
+## Must NOT
+
+- Read `process.env`. This file will be bundled into the browser via `transpilePackages: ['@gamevine/shared']` in `apps/web/next.config.ts`.
+- Touch the DOM (`window`, `document`, `localStorage`, `navigator`).
+- Touch Node-only APIs (`fs`, `path`, `crypto.createHash` — use `crypto.subtle` via a util if you need hashing, or put the util in an app).
+- Import from `@gamevine/web`, `@gamevine/api`, or their dependencies (Next, Nest, Drizzle, pg, axios, TanStack Query). Shared sits **below** both apps in the dependency graph.
+- Depend on heavy third-party libraries. `zod` is the one sanctioned exception — it's runtime, but the tradeoff (one schema source for both apps) is worth it. Get explicit agreement before adding another.
+
+## Contents that belong here
+
+- Zod schemas and the types inferred from them (`CreateGameRequest`, `GameResponse`, ...).
+- Pure helpers like path constants (`API_HEALTH_PATH`), app-level constants (`APP_NAME`), URL builders.
+- Enum-like `as const` tuples and their union types.
+- Pure transformation helpers that have no environmental dependencies.
+
+## Contents that do NOT belong here
+
+- Drizzle row types. Those are a leak of the db driver's type space — keep them in `apps/api`.
+- React components or hooks. Those are web-only.
+- Nest decorators or pipes. Those are api-only.
+- Axios clients. Those are web-only.
+- Anything that only one of the apps uses. "Shared" means *both apps*.
+
+## Breaking changes
+
+Changing an exported schema or type here is, by definition, a contract change across two deployed surfaces. Workflow:
+
+1. Edit `packages/shared/src/**`.
+2. `pnpm typecheck` from root — catches call-site breakage at compile time.
+3. Invoke the `schema-sync` subagent — it audits both apps for runtime / call-site breakage `tsc` can miss (serialization changes, enum value renames, etc.).
+4. Fix anything it flags in the same change.
+5. If the schema is used at runtime (Zod), confirm an existing spec exercises the new shape or add one.
+
+## Tests
+
+Every exported function and schema has a spec under `packages/shared/src/**/<name>.spec.ts` (once Jest is wired for this package). Schemas should be round-tripped: `schema.parse(schema.encode(value))` semantics. See `.cursor/rules/testing.mdc`.
+
+## Module resolution reminder
+
+Both apps have the path mapping `@gamevine/shared` → `packages/shared/src/index.ts` (see Jest `moduleNameMapper` in `apps/api/package.json` and TS paths). Don't import sub-paths from the apps — use the public surface at `@gamevine/shared`.

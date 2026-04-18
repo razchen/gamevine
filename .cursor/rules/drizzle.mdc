@@ -1,0 +1,73 @@
+---
+description: Drizzle ORM schema, migrations, and query conventions for the api.
+globs: apps/api/**
+alwaysApply: false
+---
+
+# Drizzle ORM
+
+## Configuration
+
+- Drizzle-kit config: `apps/api/drizzle.config.ts`.
+- Schema entry point: `apps/api/src/database/schema.ts` (per config). Tables may live in feature folders as `<feature>.schema.ts` and be re-exported from the root schema.
+- Migrations output: `apps/api/drizzle/`.
+- Driver: `drizzle-orm/node-postgres` with a shared `pg.Pool` in `DatabaseModule`.
+- `strict: true` in the drizzle-kit config — expect hard failures on schema drift, good.
+
+## Getting the db
+
+```ts
+import { Inject } from '@nestjs/common';
+import { DRIZZLE, type DrizzleDB } from '../database/database.tokens';
+
+constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) {}
+```
+
+`DrizzleDB` is `NodePgDatabase<typeof schema>` — it knows about every table you've exported from `schema.ts`, so `db.query.games.findMany(...)` is fully typed.
+
+## Schemas
+
+- Use `pgTable` (already implied by `dialect: 'postgresql'`).
+- Put each domain's tables in `apps/api/src/<feature>/<feature>.schema.ts` and re-export from `apps/api/src/database/schema.ts` so the type-param of `DrizzleDB` stays accurate.
+- Primary keys: prefer UUIDs (`uuid('id').primaryKey().defaultRandom()`) over serial ints for anything user-facing.
+- Timestamps: `created_at` and `updated_at` (`timestamp('created_at').notNull().defaultNow()`). Include both unless you have a reason not to.
+- Column names: snake_case in SQL, camelCase in the TS field name (Drizzle supports this via the second argument: `createdAt: timestamp('created_at')...`).
+- Relations: declare via `relations(...)` in the same file so `db.query.<table>.findMany({ with: ... })` works.
+
+## Migrations (the only sanctioned flow)
+
+```bash
+# Generate a migration from schema changes
+pnpm --filter @gamevine/api db:generate
+# Review the generated SQL under apps/api/drizzle/
+# Apply locally
+pnpm --filter @gamevine/api db:migrate
+```
+
+- **Migrations are immutable once merged.** If you need to fix one, add a new migration. Never edit an applied migration in place.
+- Check the generated SQL before applying — `drizzle-kit generate` can produce destructive operations (drop, alter type, add non-null without default). Those need intent, not autopilot.
+- The `drizzle-migrations` subagent automates generate → review → migrate with destructive-op detection. Prefer it over doing this by hand.
+
+## `db:push` — local only
+
+`pnpm --filter @gamevine/api db:push` applies schema changes directly without a migration file. Fine for throwaway local exploration; **never** run it against staging or production.
+
+## Querying
+
+- Prefer the query builder (`db.query.games.findMany({ where: eq(games.id, id), with: { rounds: true } })`) over raw SQL where it fits.
+- For one-off SQL (health check, rare analytics), import `sql` from `drizzle-orm` and compose with `sql\`...\`` tagged templates. Example: `health.controller.ts` uses `await this.db.execute(sql\`SELECT 1\`)`.
+- Parameterize user input. Never string-concat into a `sql\`...\`` template — the tag binds automatically, so use `${variable}` inside it.
+- Batching and transactions: `db.transaction(async (tx) => { ... })`. Use a transaction whenever two or more writes must be atomic.
+
+## Drizzle-kit Studio
+
+`pnpm --filter @gamevine/api db:studio` launches the web UI. Handy; don't use it to modify data you'd need to reproduce in code.
+
+## Forbidden
+
+- Hand-editing `apps/api/drizzle/*.sql` migration files to skirt `db:generate`.
+- Running `db:push` against any non-local `DATABASE_URL`.
+- Raw `pg` client calls alongside Drizzle — go through the `DRIZZLE` token.
+- Pool creation outside `DatabaseModule`.
+- `await this.db.execute(sql\`...\${userInput}\`)` with interpolation into a non-parameterized template. Always use the tagged template's param binding.
+- Storing Drizzle row types in `@gamevine/shared`. Shared exposes app-level types; the web app must not import Drizzle types.

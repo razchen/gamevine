@@ -1,0 +1,29 @@
+{
+  "name": "gamevine",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Gamevine.ai monorepo — browser-based games & community-driven updates",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=20.19.0",
+    "pnpm": ">=10.0.0"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:web": "turbo run dev --filter=@gamevine/web",
+    "dev:api": "turbo run dev --filter=@gamevine/api",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "clean": "turbo run clean && rm -rf node_modules .turbo",
+    "format": "prettier . --write --log-level warn",
+    "format:check": "prettier . --check --log-level warn"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "prettier": "^3.8.3",
+    "turbo": "^2.9.6",
+    "typescript": "^6.0.0"
+  }
+}

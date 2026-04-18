@@ -1,0 +1,50 @@
+---
+description: Monorepo tooling conventions (pnpm + turbo + workspace protocol)
+alwaysApply: true
+---
+
+# Monorepo Tooling
+
+This is a pnpm + Turborepo monorepo. Use the right tool.
+
+## Package manager
+
+- **pnpm only.** Never `npm`, `yarn`, `bun`, or `npx` (use `pnpm dlx`).
+- Root-level dependencies: `pnpm add -w <pkg>`.
+- Package-scoped dependencies: `pnpm --filter @gamevine/<pkg> add <dep>`.
+- Internal packages: reference with `"workspace:*"` in `package.json`.
+- Never hand-edit `pnpm-lock.yaml`. Let pnpm regenerate it.
+- Required versions per `package.json#engines`: Node `>=20.19`, pnpm `>=10`.
+
+## Turborepo
+
+- Use `turbo run <task>` via the top-level scripts (`pnpm dev`, `pnpm build`, `pnpm lint`, `pnpm test`, `pnpm typecheck`).
+- Scope a run with `--filter`: `pnpm exec turbo run build --filter=@gamevine/web`.
+- When adding a new task, register it in `turbo.json` with the correct `dependsOn`, `inputs`, `outputs`, and `env`. A missing `^build` dependency is the most common cache bug in this repo.
+
+## Workspace layout (do not invent new top-levels)
+
+- `apps/web` — Next.js frontend
+- `apps/api` — NestJS backend
+- `packages/shared` — cross-app types/constants
+- `packages/eslint-config` — shared ESLint config
+- `packages/tsconfig` — shared TS configs
+
+New application? Put it in `apps/`. New library consumed by multiple apps? `packages/`.
+
+## Running commands in the right place
+
+| Intent | Command |
+|--------|---------|
+| Run everything | `pnpm dev` (root) |
+| Run just the web app | `pnpm dev:web` (root) |
+| Run just the api | `pnpm dev:api` (root) |
+| Execute inside one package | `pnpm --filter @gamevine/<pkg> <script>` |
+| Ad-hoc exec in a package | `pnpm --filter @gamevine/<pkg> exec <cmd>` |
+
+## Forbidden
+
+- Creating a second lockfile (`package-lock.json`, `yarn.lock`, `bun.lockb`).
+- Installing the same dependency in both apps when it could live in `packages/shared`.
+- Hoisting via root `dependencies` instead of using `workspace:*`.
+- `pnpm install --force` without a stated reason.

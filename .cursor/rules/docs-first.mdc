@@ -1,0 +1,37 @@
+---
+description: Read authoritative docs before writing code for any third-party library.
+alwaysApply: true
+---
+
+# Docs First
+
+This repo uses bleeding-edge versions (Next.js 16, React 19, NestJS 11, Tailwind v4, Drizzle, TypeScript 6). Your training data is almost certainly wrong about at least one of them. **Read docs before writing code.**
+
+## The order
+
+1. **Context7 MCP** — for any third-party library, framework, SDK, CLI, or cloud service. This is non-negotiable even for libraries you "know." Use it for API syntax, configuration, version-specific behavior, migrations, and setup.
+2. **Next.js-specific**: also read `apps/web/node_modules/next/dist/docs/` directly. The `next16-docs` subagent is set up for this; prefer invoking it over searching the docs yourself.
+3. **Upstream changelogs / release notes** when Context7 doesn't cover a recent breaking change.
+
+## When you must do this
+
+- First time touching a library in this session, even briefly.
+- When the API "feels different" from what you remember — it probably is.
+- Before suggesting a pattern that relies on memory ("I think you use `X`…").
+- When upgrading any dependency.
+- Whenever you see a deprecation warning.
+
+## Record the reference
+
+When a non-trivial change depends on documentation, cite it in the PR description or commit body — library name, version, and either a URL or a Context7 topic identifier. Future you will thank present you.
+
+## Anti-patterns
+
+- "I know this API" → no, you know a snapshot of it. Check.
+- "The docs are probably the same" → they are not.
+- "I'll just try it and see" → wastes tool calls; one doc read is cheaper than three failed edits.
+- Writing code that pattern-matches a Stack Overflow answer from 2023 against a 2026 library.
+
+## Escape hatch
+
+If a library is small, stable, and well-known (e.g., `classnames`, `zod` basics, `date-fns` primitives) and your change is trivial, a doc read may be overkill. The bar: "would reading the docs plausibly change my code?" If yes, read.

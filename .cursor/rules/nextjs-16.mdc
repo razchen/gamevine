@@ -1,0 +1,90 @@
+---
+description: Next.js 16 conventions. This is NOT the Next.js you know — read docs before writing.
+globs: apps/web/**
+alwaysApply: false
+---
+
+# Next.js 16
+
+> Your training data is almost certainly out of date for Next 16. Before writing any Next-specific code, consult `apps/web/node_modules/next/dist/docs/` and/or invoke the `next16-docs` subagent. See `.cursor/rules/docs-first.mdc`.
+
+## App Router only
+
+- Routes live under `apps/web/src/app/**`. Never create a `pages/` directory.
+- No `getServerSideProps`, `getStaticProps`, `getInitialProps`, `_app.tsx`, `_document.tsx`. These do not exist here.
+- Route Handlers live at `apps/web/src/app/**/route.ts` (not `api/*.ts` in a pages tree).
+- Special files: `layout.tsx`, `page.tsx`, `loading.tsx`, `error.tsx`, `not-found.tsx`, `template.tsx`, `default.tsx`, `route.ts`, `middleware.ts` (top level).
+
+## Server vs client components
+
+- **Server Components are the default.** Don't add `"use client"` unless you genuinely need hooks, event handlers, or browser APIs.
+- `"use client"` marks a *boundary*, not a per-component attribute. Once a subtree is client, its children don't need their own directive.
+- Do not put `"use client"` on leaf interactive components when a parent is already client.
+- Server Components can be `async` and `await` data directly. Do this instead of a `useEffect + setState` dance.
+
+## Async `params` and `searchParams`
+
+In Next 15+ (and therefore 16), `params` and `searchParams` in page / layout / route handlers are **Promises**. You must `await` them:
+
+```tsx
+export default async function Page({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const { id } = await params;
+  const query = await searchParams;
+  // ...
+}
+```
+
+Forgetting the `await` is the single most common Next-16-specific bug LLMs produce. Don't.
+
+## Route handlers
+
+```ts
+// apps/web/src/app/games/[id]/route.ts
+export async function GET(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { id } = await params;
+  // ...
+  return Response.json({ id });
+}
+```
+
+- Export `GET`, `POST`, `PATCH`, `PUT`, `DELETE`, etc., as named async functions.
+- Return `Response` or `Response.json()`. Do not import `NextResponse` unless you specifically need its features (rewrite/redirect/cookies helpers).
+
+## Metadata
+
+Use static `metadata` export or `generateMetadata` (async). Example in `apps/web/src/app/layout.tsx`. Metadata types come from `next`, not a sub-path.
+
+## Fonts and images
+
+- Fonts via `next/font/google` or `next/font/local`. Already wired in `layout.tsx` using Geist.
+- Images via `next/image`. Any external host must be listed in `remotePatterns` inside `apps/web/next.config.ts`. Never hardcode dimensions — use `fill` with a sized parent or pass `width`/`height`.
+
+## Next config
+
+`apps/web/next.config.ts` has `transpilePackages: ['@gamevine/shared']` and `experimental.typedRoutes: true`. The typed routes feature means `Link` `href` is type-checked against actual route segments — don't work around it with `as any` or string casts.
+
+## Caching
+
+Next 16 caching semantics changed again. Never assume; look up `fetch` options, `revalidate`, `no-store`, `cache`, `unstable_cache`, `use cache`, and the route segment config in the docs before relying on them. Use `next16-docs` for questions.
+
+## Middleware
+
+One `apps/web/src/middleware.ts` per app. Export `middleware` and optional `config.matcher`. Runs on the Edge runtime by default — Node APIs are unavailable unless you opt in.
+
+## Forbidden
+
+- Creating `apps/web/pages/**`.
+- Importing from `next/router` (it's `next/navigation`).
+- `getServerSideProps` / `getStaticProps` / `getInitialProps`.
+- Forgetting to `await` `params` or `searchParams`.
+- Hardcoding an external image host without updating `remotePatterns`.
+- Writing a client component that could be a Server Component.

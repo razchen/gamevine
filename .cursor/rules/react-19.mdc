@@ -1,0 +1,71 @@
+---
+description: React 19 idioms. The React Compiler is in play; memoization hygiene has changed.
+globs: apps/web/**/*.ts,apps/web/**/*.tsx
+alwaysApply: false
+---
+
+# React 19
+
+## Refs are props
+
+`forwardRef` is obsolete. A function component can accept `ref` as a regular prop:
+
+```tsx
+function Input({ ref, ...props }: React.ComponentProps<'input'>) {
+  return <input ref={ref} {...props} />;
+}
+```
+
+Do not wrap in `forwardRef`. Do not import `forwardRef`. It still exists for back-compat but is discouraged in new code.
+
+## `use()` for promises and context
+
+- `use(promise)` unwraps a promise inside a client component that's wrapped in `<Suspense>`. Prefer this over `.then` dances.
+- `use(context)` can be called **conditionally** (inside `if` / loops) — unlike `useContext`.
+
+## Actions and form primitives
+
+Forms integrate with Server Actions via these hooks:
+
+- `useActionState(action, initialState)` — replaces the old `useFormState`. Returns `[state, dispatch, isPending]`.
+- `useFormStatus()` — read pending state from inside a `<form>` child.
+- `useOptimistic(state, updateFn)` — optimistic UI.
+
+Wire forms with `<form action={serverAction}>` where the action is a Server Action (either a function in a `"use server"` file or exported from a Server Component). Progressive enhancement is free.
+
+## `useTransition` and `startTransition`
+
+- Use `startTransition` to mark non-urgent updates (filters, tab switches). The returned `isPending` gives you a built-in loading indicator — prefer it over a hand-rolled `useState(false)`.
+
+## Memoization hygiene (compiler era)
+
+The React Compiler memoizes automatically. Manual `useMemo` / `useCallback` / `React.memo` should be **rare** and justified:
+
+- Expensive computation (not simple math or object construction).
+- Stable reference required for a dependency array.
+- Passed to a child wrapped in `React.memo`.
+
+Rule of thumb: if you can't articulate **why** a value needs manual memoization in one sentence, delete it.
+
+## Hydration
+
+- `suppressHydrationWarning` is acceptable only on elements where a mismatch is intentional and documented (e.g., `<html>` for theme classes set by a pre-hydration script). Already used in `apps/web/src/app/layout.tsx` for that purpose.
+- Never use `suppressHydrationWarning` to paper over a real mismatch.
+
+## No class components
+
+New code is function components only. The codebase has none; keep it that way.
+
+## Ergonomic patterns
+
+- `ComponentProps<'div'>` to get the props of a built-in; `ComponentPropsWithoutRef` when you're taking a `ref`.
+- Prefer `type` over `interface` for props; interfaces only when you need declaration merging.
+- Discriminated unions for variant props (`type Props = { variant: 'a'; foo: string } | { variant: 'b'; bar: number }`).
+
+## Forbidden
+
+- `forwardRef` wrappers on new components.
+- `useMemo` / `useCallback` on trivial values. The compiler has you covered; noise is a code smell.
+- `React.FC<Props>` — prefer explicit function declarations with typed `{ children }`.
+- Mutating state directly. Always produce new values.
+- `useEffect` as a router for derived state. Derive during render.

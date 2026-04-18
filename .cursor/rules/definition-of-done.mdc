@@ -1,0 +1,49 @@
+---
+description: What "done" means in this repo. Not negotiable.
+alwaysApply: true
+---
+
+# Definition of Done
+
+A task is only "done" when **all** of the following hold. Passing `tsc` is the floor, not the ceiling.
+
+## The gauntlet (run from repo root)
+
+```bash
+pnpm typecheck && pnpm lint && pnpm test
+```
+
+All three must exit 0. No exceptions. If a test was failing before your change and you didn't cause it, that still blocks done — fix it or surface it to the user.
+
+## Code hygiene
+
+- No new `any`. If you must, leave a comment explaining why and what would be needed to remove it.
+- No new `@ts-expect-error` or `@ts-ignore` without a one-line justification and a linked issue or TODO.
+- No `.skip` / `.only` / `xit` / `fdescribe` in committed code.
+- No `console.log` left in shipped code (allowed inside `*.spec.ts`).
+- No commented-out code. If it's gone, it's gone — git remembers.
+
+## Runtime verification (the ceiling)
+
+`tsc` proves the types line up. It does not prove the data flows. If your change does any of these, you must prove it at runtime, not just at compile time:
+
+- Modifies `packages/shared/**` → run the `schema-sync` subagent; confirm both apps still typecheck and, where the contract is exercised, the runtime path still works.
+- Modifies `apps/api/**/*.schema.ts` or any Drizzle schema → `pnpm --filter @gamevine/api db:generate`, review the SQL, migrate locally, confirm a representative query.
+- Modifies `apps/web` routes or data-fetching → run the `e2e-smoke` subagent or drive the page manually via the browser MCP.
+- Modifies auth / API routes / env handling → run the `security-auditor` subagent.
+
+## The agent pipeline
+
+This repo enforces a sequential agent pipeline after implementation (`code-reviewer`, `react-perf-reviewer` if `.tsx`/`.jsx` touched, `test-runner`, `dry-checker`, etc.). See `.cursor/rules/agent-pipeline.mdc`. Running the pipeline is part of done. Dismissing an agent's recommendation is not.
+
+## What "done" is NOT
+
+- "Types pass." (Floor, not ceiling.)
+- "Tests pass on my machine but I skipped two." (No.)
+- "I'll add tests in a follow-up." (No. Do it now.)
+- "The lint error is unrelated." (Still blocks done. Fix or surface.)
+- "It compiles" for a schema change. (Prove the data flows.)
+
+## The Boil the Ocean principle
+
+From the workspace rules: the marginal cost of completeness is near zero with AI. If the permanent fix is within reach, do the permanent fix. If a test is five minutes away, write it. If a rough edge can be polished, polish it. The standard is "holy shit, that's done," not "politely satisfied."
