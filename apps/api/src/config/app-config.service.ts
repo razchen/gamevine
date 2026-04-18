@@ -31,6 +31,34 @@ export class AppConfigService {
     return this.config.get('SENTRY_DSN', { infer: true });
   }
 
+  get aiApiKey(): string | undefined {
+    return this.config.get('AI_API_KEY', { infer: true });
+  }
+
+  get aiModel(): string | undefined {
+    return this.config.get('AI_MODEL', { infer: true });
+  }
+
+  get aiBaseUrl(): string {
+    return this.config.get('AI_BASE_URL', { infer: true });
+  }
+
+  get pocApiEnabled(): boolean {
+    return this.config.get('POC_API_ENABLED', { infer: true });
+  }
+
+  get pocMaxConcurrentRuns(): number {
+    return this.config.get('POC_MAX_CONCURRENT_RUNS', { infer: true });
+  }
+
+  get pocRunsDir(): string {
+    return this.config.get('POC_RUNS_DIR', { infer: true });
+  }
+
+  get pocTemplatesRoot(): string {
+    return this.config.get('POC_TEMPLATES_ROOT', { infer: true });
+  }
+
   get isProduction(): boolean {
     return this.nodeEnv === 'production';
   }

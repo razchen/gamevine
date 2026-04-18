@@ -9,6 +9,12 @@ describe('validateEnv', () => {
     expect(env.DATABASE_URL).toBe(VALID_DATABASE_URL);
     expect(env.CORS_ORIGIN).toEqual(['http://localhost:3000']);
     expect(env.SENTRY_DSN).toBeUndefined();
+    expect(env.AI_API_KEY).toBeUndefined();
+    expect(env.AI_MODEL).toBeUndefined();
+    expect(env.AI_BASE_URL).toBe('https://openrouter.ai/api/v1');
+    expect(env.POC_API_ENABLED).toBe(false);
+    expect(env.POC_RUNS_DIR).toBe('.gamevine/poc-runs');
+    expect(env.POC_TEMPLATES_ROOT).toBe('.gamevine/poc-templates');
   });
 
   it('applies defaults for NODE_ENV, PORT, and CORS_ORIGIN', () => {
@@ -16,6 +22,53 @@ describe('validateEnv', () => {
     expect(env.NODE_ENV).toBe('development');
     expect(env.PORT).toBe(3001);
     expect(env.CORS_ORIGIN).toEqual(['http://localhost:3000']);
+    expect(env.AI_BASE_URL).toBe('https://openrouter.ai/api/v1');
+    expect(env.POC_API_ENABLED).toBe(false);
+    expect(env.POC_RUNS_DIR).toBe('.gamevine/poc-runs');
+    expect(env.POC_TEMPLATES_ROOT).toBe('.gamevine/poc-templates');
+  });
+
+  it('accepts optional AI provider configuration values', () => {
+    const env = validateEnv(
+      createValidRawEnv({
+        AI_API_KEY: 'test-key',
+        AI_MODEL: 'gpt-5.2',
+        AI_BASE_URL: 'https://example.com/v1',
+        POC_API_ENABLED: 'true',
+        POC_RUNS_DIR: '.custom/poc-runs',
+        POC_TEMPLATES_ROOT: '.custom/poc-templates',
+      }),
+    );
+
+    expect(env.AI_API_KEY).toBe('test-key');
+    expect(env.AI_MODEL).toBe('gpt-5.2');
+    expect(env.AI_BASE_URL).toBe('https://example.com/v1');
+    expect(env.POC_API_ENABLED).toBe(true);
+    expect(env.POC_RUNS_DIR).toBe('.custom/poc-runs');
+    expect(env.POC_TEMPLATES_ROOT).toBe('.custom/poc-templates');
+  });
+
+  it('rejects whitespace-only AI provider and POC path values', () => {
+    expect(() =>
+      validateEnv(
+        createValidRawEnv({
+          AI_API_KEY: '   ',
+          AI_MODEL: '   ',
+          POC_RUNS_DIR: '   ',
+          POC_TEMPLATES_ROOT: '   ',
+        }),
+      ),
+    ).toThrow(/AI_API_KEY|AI_MODEL|POC_RUNS_DIR|POC_TEMPLATES_ROOT/);
+  });
+
+  it('rejects non-https AI_BASE_URL values outside localhost', () => {
+    expect(() =>
+      validateEnv(
+        createValidRawEnv({
+          AI_BASE_URL: 'http://example.com/v1',
+        }),
+      ),
+    ).toThrow(/AI_BASE_URL/);
   });
 
   it('splits, trims, and drops empty entries from CORS_ORIGIN', () => {

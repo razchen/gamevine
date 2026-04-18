@@ -117,13 +117,20 @@ Run at the repo root; Turborepo fans out to each workspace in parallel.
 
 Documented in full in [`.env.example`](.env.example). Summary:
 
-| Variable              | Consumer | Purpose                                    |
-| --------------------- | -------- | ------------------------------------------ |
-| `NODE_ENV`            | both     | `development` \| `test` \| `production`    |
-| `DATABASE_URL`        | api      | Postgres connection string                 |
-| `PORT`                | api      | HTTP port the Nest server binds            |
-| `CORS_ORIGIN`         | api      | Allowed browser origin                     |
-| `NEXT_PUBLIC_API_URL` | web      | Base URL the web app uses to reach the API |
+| Variable                  | Consumer | Purpose                                                      |
+| ------------------------- | -------- | ------------------------------------------------------------ |
+| `NODE_ENV`                | both     | `development` \| `test` \| `production`                      |
+| `DATABASE_URL`            | api      | Postgres connection string                                   |
+| `PORT`                    | api      | HTTP port the Nest server binds                              |
+| `CORS_ORIGIN`             | api      | Allowed browser origin                                       |
+| `AI_API_KEY`              | api      | API key for the OpenAI-compatible provider used by the POC   |
+| `AI_MODEL`                | api      | Default model for POC generation runs                        |
+| `AI_BASE_URL`             | api      | Base URL for an OpenAI-compatible Responses API provider     |
+| `POC_API_ENABLED`         | api      | Enables the local POC generation endpoint outside production |
+| `POC_MAX_CONCURRENT_RUNS` | api      | Concurrency cap for local POC runs                           |
+| `POC_RUNS_DIR`            | api      | Local storage directory for POC run output                   |
+| `POC_TEMPLATES_ROOT`      | api      | Server-owned root for allowed POC templates                  |
+| `NEXT_PUBLIC_API_URL`     | web      | Base URL the web app uses to reach the API                   |
 
 Each app also has its own example file (`apps/api/.env.example`,
 `apps/web/.env.local.example`) for locality. `.env*` files are gitignored

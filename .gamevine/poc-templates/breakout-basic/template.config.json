@@ -1,0 +1,8 @@
+{
+  "name": "Arcade Canvas Starter",
+  "editableFiles": ["src/index.html", "src/main.js", "src/styles.css"],
+  "staticBuild": {
+    "outputDir": "dist",
+    "entryHtml": "dist/index.html"
+  }
+}

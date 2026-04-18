@@ -42,6 +42,21 @@ const SentryDsn = z
   )
   .optional();
 
+const AiBaseUrl = z
+  .string()
+  .trim()
+  .url()
+  .refine((value) => {
+    const url = new URL(value);
+    if (url.protocol === 'https:') {
+      return true;
+    }
+
+    return (
+      url.protocol === 'http:' && (url.hostname === 'localhost' || url.hostname === '127.0.0.1')
+    );
+  }, 'AI_BASE_URL must use https unless it targets localhost for local development');
+
 export const envSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -64,6 +79,16 @@ export const envSchema = z
       )
       .pipe(z.array(OriginEntry).min(1, 'CORS_ORIGIN must contain at least one origin')),
     SENTRY_DSN: SentryDsn,
+    AI_API_KEY: z.string().trim().min(1).optional(),
+    AI_MODEL: z.string().trim().min(1).optional(),
+    AI_BASE_URL: AiBaseUrl.default('https://openrouter.ai/api/v1'),
+    POC_API_ENABLED: z
+      .enum(['true', 'false'])
+      .default('false')
+      .transform((value) => value === 'true'),
+    POC_MAX_CONCURRENT_RUNS: z.coerce.number().int().positive().default(1),
+    POC_RUNS_DIR: z.string().trim().min(1).default('.gamevine/poc-runs'),
+    POC_TEMPLATES_ROOT: z.string().trim().min(1).default('.gamevine/poc-templates'),
   })
   .superRefine((env, ctx) => {
     if (

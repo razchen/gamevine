@@ -24,6 +24,15 @@ coverage/
 npm-debug.log*
 pnpm-debug.log*
 
+# Local POC run artifacts
+.gamevine/*
+!.gamevine/poc-templates/
+!.gamevine/poc-templates/**
+.gamevine/poc-runs/
+.gamevine/poc-templates/**/dist/
+.gamevine/poc-templates/**/node_modules/
+.gamevine/poc-templates/**/pnpm-lock.yaml
+
 # Editors / OS
 .DS_Store
 .idea/

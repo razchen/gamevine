@@ -63,15 +63,22 @@ pnpm --filter @gamevine/api db:studio     # web UI for the DB
 
 Required env vars (see `apps/api/src/config/env.validation.ts`):
 
-| Var            | Default                 | Notes                                                                                 |
-| -------------- | ----------------------- | ------------------------------------------------------------------------------------- |
-| `NODE_ENV`     | `development`           | `development` / `test` / `production`                                                 |
-| `PORT`         | `3001`                  |                                                                                       |
-| `DATABASE_URL` | —                       | `postgres://` or `postgresql://` only, required                                       |
-| `CORS_ORIGIN`  | `http://localhost:3000` | Single origin or comma-separated list. Parsed into `string[]` before `enableCors()`.  |
-| `SENTRY_DSN`   | —                       | Optional. Must be a valid URL. `AppConfigService.sentryDsn` is `string \| undefined`. |
+| Var                       | Default                        | Notes                                                                                                                           |
+| ------------------------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| `NODE_ENV`                | `development`                  | `development` / `test` / `production`                                                                                           |
+| `PORT`                    | `3001`                         |                                                                                                                                 |
+| `DATABASE_URL`            | —                              | `postgres://` or `postgresql://` only, required                                                                                 |
+| `CORS_ORIGIN`             | `http://localhost:3000`        | Single origin or comma-separated list. Parsed into `string[]` before `enableCors()`.                                            |
+| `SENTRY_DSN`              | —                              | Optional. Must be a valid URL. `AppConfigService.sentryDsn` is `string \| undefined`.                                           |
+| `AI_API_KEY`              | —                              | Optional until the POC generation endpoint is used. Required for live model requests.                                           |
+| `AI_MODEL`                | —                              | Optional default model for the POC generation endpoint.                                                                         |
+| `AI_BASE_URL`             | `https://openrouter.ai/api/v1` | Base URL for an OpenAI-compatible Responses API provider (for example OpenRouter). Must use `https` unless targeting localhost. |
+| `POC_API_ENABLED`         | `false`                        | Must be `true` to enable the local POC generation endpoint, and the endpoint is still disabled in production.                   |
+| `POC_MAX_CONCURRENT_RUNS` | `1`                            | Simple in-process concurrency cap for POC generation runs.                                                                      |
+| `POC_RUNS_DIR`            | `.gamevine/poc-runs`           | Directory where the API stores local POC run artifacts and copied workspaces.                                                   |
+| `POC_TEMPLATES_ROOT`      | `.gamevine/poc-templates`      | Server-owned template root. Requests use template IDs beneath this directory.                                                   |
 
-Local setup: copy `.env.example` (create if missing, matching `envSchema`) to `.env.development.local` and fill in. The bootstrap throws a readable error listing every failing field if something is missing.
+Local setup: copy `.env.example` to `.env` and fill it in. The bootstrap throws a readable error listing every failing field if something is missing.
 
 ## When implementing a new feature
 

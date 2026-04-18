@@ -27,18 +27,39 @@ async function makeService(
 // split/trim/filter logic is covered exhaustively in env.validation.spec.ts.
 describe('AppConfigService', () => {
   it('exposes typed, passthrough getters for every env field', async () => {
-    const svc = await makeService({ SENTRY_DSN: VALID_SENTRY_DSN });
+    const svc = await makeService({
+      SENTRY_DSN: VALID_SENTRY_DSN,
+      AI_API_KEY: 'test-key',
+      AI_MODEL: 'gpt-5.2',
+      AI_BASE_URL: 'https://example.com/v1',
+      POC_API_ENABLED: 'true',
+      POC_RUNS_DIR: '.custom/poc-runs',
+      POC_TEMPLATES_ROOT: '.custom/poc-templates',
+    });
     expect(svc.nodeEnv).toBe('test');
     expect(svc.port).toBe(3001);
     expect(svc.databaseUrl).toMatch(/^postgres:\/\//);
     expect(svc.corsOrigin).toEqual(['http://localhost:3000']);
     expect(svc.sentryDsn).toBe(VALID_SENTRY_DSN);
+    expect(svc.aiApiKey).toBe('test-key');
+    expect(svc.aiModel).toBe('gpt-5.2');
+    expect(svc.aiBaseUrl).toBe('https://example.com/v1');
+    expect(svc.pocApiEnabled).toBe(true);
+    expect(svc.pocMaxConcurrentRuns).toBe(1);
+    expect(svc.pocRunsDir).toBe('.custom/poc-runs');
+    expect(svc.pocTemplatesRoot).toBe('.custom/poc-templates');
     expect(svc.isProduction).toBe(false);
   });
 
   it('returns undefined for sentryDsn when SENTRY_DSN is not set', async () => {
     const svc = await makeService();
     expect(svc.sentryDsn).toBeUndefined();
+    expect(svc.aiApiKey).toBeUndefined();
+    expect(svc.aiModel).toBeUndefined();
+    expect(svc.aiBaseUrl).toBe('https://openrouter.ai/api/v1');
+    expect(svc.pocApiEnabled).toBe(false);
+    expect(svc.pocRunsDir).toBe('.gamevine/poc-runs');
+    expect(svc.pocTemplatesRoot).toBe('.gamevine/poc-templates');
   });
 
   it('isProduction is true when NODE_ENV=production', async () => {
