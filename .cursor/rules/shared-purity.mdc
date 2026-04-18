@@ -36,7 +36,7 @@ This package is the **contract** between the web and api apps. It is consumed by
 - React components or hooks. Those are web-only.
 - Nest decorators or pipes. Those are api-only.
 - Axios clients. Those are web-only.
-- Anything that only one of the apps uses. "Shared" means *both apps*.
+- Anything that only one of the apps uses. "Shared" means _both apps_.
 
 ## Breaking changes
 

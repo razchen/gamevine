@@ -31,16 +31,16 @@ Each rule file contains: a brief explanation of why it matters, an incorrect cod
 
 The skill organizes 57 rules across 8 categories, prioritized by impact:
 
-| Priority | Category | Prefix |
-|----------|----------|--------|
-| 1 | Eliminating Waterfalls | `async-` |
-| 2 | Bundle Size Optimization | `bundle-` |
-| 3 | Server-Side Performance | `server-` |
-| 4 | Client-Side Data Fetching | `client-` |
-| 5 | Re-render Optimization | `rerender-` |
-| 6 | Rendering Performance | `rendering-` |
-| 7 | JavaScript Performance | `js-` |
-| 8 | Advanced Patterns | `advanced-` |
+| Priority | Category                  | Prefix       |
+| -------- | ------------------------- | ------------ |
+| 1        | Eliminating Waterfalls    | `async-`     |
+| 2        | Bundle Size Optimization  | `bundle-`    |
+| 3        | Server-Side Performance   | `server-`    |
+| 4        | Client-Side Data Fetching | `client-`    |
+| 5        | Re-render Optimization    | `rerender-`  |
+| 6        | Rendering Performance     | `rendering-` |
+| 7        | JavaScript Performance    | `js-`        |
+| 8        | Advanced Patterns         | `advanced-`  |
 
 Review changes against rules in this order. Critical/High categories get the most scrutiny.
 
@@ -74,7 +74,7 @@ Review changes against rules in this order. Critical/High categories get the mos
 
 ## Report format
 
-```
+````
 FILES REVIEWED
 - apps/web/src/app/games/page.tsx
 - apps/web/src/features/games/hooks.ts
@@ -86,22 +86,26 @@ CRITICAL
   Fix:
   ```tsx
   const [a, b, c] = await Promise.all([fetchA(), fetchB(), fetchC()]);
-  ```
+````
 
 - rule: bundle-barrel-imports — apps/web/src/features/games/index.ts:1
   Barrel export forces bundler to evaluate all feature files. Import directly.
 
 HIGH
+
 - rule: server-cache-react — apps/web/src/app/games/[id]/page.tsx:8
   `fetchGame` called in two places per request; wrap with React.cache().
 
 MEDIUM
+
 - rule: rerender-derived-state-no-effect — ...
 
 LOW-MEDIUM
+
 - rule: js-set-map-lookups — ...
 
 VERDICT: APPROVE / REQUEST CHANGES / NEEDS DISCUSSION
+
 ```
 
 ## Mandatory compliance
@@ -117,3 +121,4 @@ You are invoked when **any** `.tsx` or `.jsx` file was modified. This is a file-
 - "Only styling" is not an exemption.
 
 If the parent invoked you, do the review. If the parent should have invoked you and didn't, the pre-completion checklist will catch it.
+```

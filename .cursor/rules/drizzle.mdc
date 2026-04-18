@@ -55,8 +55,8 @@ pnpm --filter @gamevine/api db:migrate
 ## Querying
 
 - Prefer the query builder (`db.query.games.findMany({ where: eq(games.id, id), with: { rounds: true } })`) over raw SQL where it fits.
-- For one-off SQL (health check, rare analytics), import `sql` from `drizzle-orm` and compose with `sql\`...\`` tagged templates. Example: `health.controller.ts` uses `await this.db.execute(sql\`SELECT 1\`)`.
-- Parameterize user input. Never string-concat into a `sql\`...\`` template — the tag binds automatically, so use `${variable}` inside it.
+- For one-off SQL (health check, rare analytics), import `sql` from `drizzle-orm` and compose with `sql\`...\``tagged templates. Example:`health.controller.ts`uses`await this.db.execute(sql\`SELECT 1\`)`.
+- Parameterize user input. Never string-concat into a `sql\`...\``template — the tag binds automatically, so use`${variable}` inside it.
 - Batching and transactions: `db.transaction(async (tx) => { ... })`. Use a transaction whenever two or more writes must be atomic.
 
 ## Drizzle-kit Studio

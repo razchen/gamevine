@@ -20,7 +20,7 @@ Plus all always-applied rules: `monorepo`, `definition-of-done`, `docs-first`, `
 ```
 apps/api/
   src/
-    main.ts                          # bootstrap (global ValidationPipe, CORS, shutdown hooks)
+    main.ts                          # bootstrap (CORS, shutdown hooks; no global ValidationPipe)
     app.module.ts                    # wires ConfigModule + AppConfigModule + DatabaseModule + features
     config/
       env.validation.ts              # single Zod env schema
@@ -63,12 +63,13 @@ pnpm --filter @gamevine/api db:studio     # web UI for the DB
 
 Required env vars (see `apps/api/src/config/env.validation.ts`):
 
-| Var | Default | Notes |
-|-----|---------|-------|
-| `NODE_ENV` | `development` | `development` / `test` / `production` |
-| `PORT` | `3001` | |
-| `DATABASE_URL` | — | `postgres://` or `postgresql://` only, required |
-| `CORS_ORIGIN` | `http://localhost:3000` | Passed to `app.enableCors({ origin })` |
+| Var            | Default                 | Notes                                                                                 |
+| -------------- | ----------------------- | ------------------------------------------------------------------------------------- |
+| `NODE_ENV`     | `development`           | `development` / `test` / `production`                                                 |
+| `PORT`         | `3001`                  |                                                                                       |
+| `DATABASE_URL` | —                       | `postgres://` or `postgresql://` only, required                                       |
+| `CORS_ORIGIN`  | `http://localhost:3000` | Single origin or comma-separated list. Parsed into `string[]` before `enableCors()`.  |
+| `SENTRY_DSN`   | —                       | Optional. Must be a valid URL. `AppConfigService.sentryDsn` is `string \| undefined`. |
 
 Local setup: copy `.env.example` (create if missing, matching `envSchema`) to `.env.development.local` and fill in. The bootstrap throws a readable error listing every failing field if something is missing.
 

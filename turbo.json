@@ -6,34 +6,25 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        "!**/*.test.*",
-        "!**/*.spec.*",
-        "!**/__tests__/**"
-      ],
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.test.*", "!**/*.spec.*", "!**/__tests__/**"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"],
       "env": ["NEXT_PUBLIC_*"]
     },
     "dev": {
       "cache": false,
       "persistent": true,
-      "env": ["DATABASE_URL", "PORT", "CORS_ORIGIN", "NEXT_PUBLIC_*", "NODE_ENV"]
+      "env": ["DATABASE_URL", "PORT", "CORS_ORIGIN", "SENTRY_DSN", "NEXT_PUBLIC_*", "NODE_ENV"]
     },
     "lint": {
-      "dependsOn": ["^build"],
       "outputs": []
     },
     "typecheck": {
-      "dependsOn": ["^build"],
       "outputs": []
     },
     "test": {
-      "dependsOn": ["^build"],
       "outputs": []
     },
     "test:cov": {
-      "dependsOn": ["^build"],
       "outputs": ["coverage/**"]
     },
     "clean": {

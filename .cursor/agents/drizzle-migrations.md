@@ -23,6 +23,7 @@ Any change to a Drizzle schema (`apps/api/src/**/*.schema.ts` or `apps/api/src/d
    - Confirm `NODE_ENV=development` or is unset (defaults to development per the env schema).
 
 2. **Generate the migration:**
+
    ```bash
    pnpm --filter @gamevine/api db:generate
    ```
@@ -40,6 +41,7 @@ Any change to a Drizzle schema (`apps/api/src/**/*.schema.ts` or `apps/api/src/d
 5. **Pause for review when you flag anything.** Print the flagged SQL and your concern, and ask the parent to confirm intent before continuing. If the parent insists on proceeding despite a flag, surface that to the human user instead of silently running.
 
 6. **Apply locally:**
+
    ```bash
    pnpm --filter @gamevine/api db:migrate
    ```

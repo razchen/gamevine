@@ -19,17 +19,21 @@ You are the lint / typecheck janitor for the gamevine monorepo.
 You run a **bounded loop** — max 5 iterations. The loop:
 
 1. **Run typecheck:**
+
    ```bash
    pnpm typecheck
    ```
+
    If non-zero exit, read the errors. Go to step 3.
 
 2. **Run lint with auto-fix:**
+
    ```bash
    pnpm lint -- --fix
    # or, per package:
    pnpm --filter @gamevine/web lint -- --fix
    ```
+
    `pnpm lint` invokes the configured lint command per package (usually ESLint or Nest's lint). `--fix` is forwarded and resolves anything auto-fixable.
 
 3. **Resolve errors.** For each error (typecheck or remaining lint):

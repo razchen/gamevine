@@ -135,10 +135,7 @@ export default function RouteError({
   return (
     <div className="flex flex-col items-center gap-4 p-6">
       <p className="text-destructive">Something went wrong.</p>
-      <button
-        onClick={reset}
-        className="rounded-md bg-primary px-4 py-2 text-primary-foreground"
-      >
+      <button onClick={reset} className="bg-primary text-primary-foreground rounded-md px-4 py-2">
         Try again
       </button>
     </div>
@@ -149,10 +146,7 @@ export default function RouteError({
 ### `route.ts` (if a Route Handler)
 
 ```ts
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   return Response.json({ id });
 }

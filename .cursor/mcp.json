@@ -8,11 +8,7 @@
     },
     "postgres": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-postgres",
-        "${env:DATABASE_URL}"
-      ],
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "${env:DATABASE_URL}"],
       "description": "Local Postgres for drizzle-migrations and debugging. Reads DATABASE_URL from the user env (same var the api uses, see apps/api/src/config/env.validation.ts).",
       "env": {}
     }

@@ -9,23 +9,23 @@ Run agents **sequentially, not in parallel** to avoid conflicts. The pipeline be
 
 ## The full agent roster
 
-| Agent | Purpose | When to use |
-|-------|---------|-------------|
-| `next16-docs` | Next.js 16 / React 19 authoritative answers | Before writing any Next/React code you're not certain about |
-| `schema-sync` | Audit cross-app breakage when contracts change | Any change to `packages/shared/**` or `apps/api/**/*.schema.ts` |
-| `drizzle-migrations` | Generate, review, and apply Drizzle migrations | Drizzle schema changes |
-| `e2e-smoke` | Drive the running web app to prove a flow works | After changes to `apps/web` routes or client flows |
-| `nest-feature` | Scaffold a Nest feature module | Creating a new api domain |
-| `web-route` | Scaffold an App Router route | Creating a new web route |
-| `turbo-doctor` | Diagnose turbo cache / pipeline issues | `turbo` cache misbehaves or is too cold |
-| `sentry-triage` | Turn a Sentry issue into a fix plan | Production error investigation |
-| `lint-typecheck-fixer` | Bounded lint-fix + typecheck loop | Before claiming done |
-| `code-reviewer` | Quality, correctness, readability review | MANDATORY after implementation |
-| `react-perf-reviewer` | Vercel 57-rule React/Next perf review | MANDATORY if any `.tsx`/`.jsx` touched |
-| `dry-checker` | Find duplicates and existing utils | BEFORE coding and after implementation |
-| `test-runner` | Run tests + enforce spec-per-changed-file | MANDATORY after implementation |
-| `debugger` | Root-cause analysis for current-session errors | Errors, test failures, unexpected behavior |
-| `security-auditor` | Auth / API route / env security review | MANDATORY if auth, API routes, env, or DB touched |
+| Agent                  | Purpose                                         | When to use                                                     |
+| ---------------------- | ----------------------------------------------- | --------------------------------------------------------------- |
+| `next16-docs`          | Next.js 16 / React 19 authoritative answers     | Before writing any Next/React code you're not certain about     |
+| `schema-sync`          | Audit cross-app breakage when contracts change  | Any change to `packages/shared/**` or `apps/api/**/*.schema.ts` |
+| `drizzle-migrations`   | Generate, review, and apply Drizzle migrations  | Drizzle schema changes                                          |
+| `e2e-smoke`            | Drive the running web app to prove a flow works | After changes to `apps/web` routes or client flows              |
+| `nest-feature`         | Scaffold a Nest feature module                  | Creating a new api domain                                       |
+| `web-route`            | Scaffold an App Router route                    | Creating a new web route                                        |
+| `turbo-doctor`         | Diagnose turbo cache / pipeline issues          | `turbo` cache misbehaves or is too cold                         |
+| `sentry-triage`        | Turn a Sentry issue into a fix plan             | Production error investigation                                  |
+| `lint-typecheck-fixer` | Bounded lint-fix + typecheck loop               | Before claiming done                                            |
+| `code-reviewer`        | Quality, correctness, readability review        | MANDATORY after implementation                                  |
+| `react-perf-reviewer`  | Vercel 57-rule React/Next perf review           | MANDATORY if any `.tsx`/`.jsx` touched                          |
+| `dry-checker`          | Find duplicates and existing utils              | BEFORE coding and after implementation                          |
+| `test-runner`          | Run tests + enforce spec-per-changed-file       | MANDATORY after implementation                                  |
+| `debugger`             | Root-cause analysis for current-session errors  | Errors, test failures, unexpected behavior                      |
+| `security-auditor`     | Auth / API route / env security review          | MANDATORY if auth, API routes, env, or DB touched               |
 
 Use Cursor's built-in **Plan Mode** for planning complex features. There is no `planner` subagent; Plan Mode replaces it.
 
@@ -47,12 +47,14 @@ Use Cursor's built-in **Plan Mode** for planning complex features. There is no `
 ## Non-negotiable rules
 
 **Step 4 (react-perf-reviewer) is a FILE-TYPE check, not a judgment call.**
+
 - If any modified file ends in `.tsx` or `.jsx`, run it. Period.
 - "Just CSS changes" is not an exemption.
 - "No logic changes" is not an exemption.
 - "Only styling" is not an exemption.
 
 **Agent recommendations are mandatory.**
+
 - When an agent flags something, you apply the fix.
 - You are NOT allowed to dismiss findings with "it's the existing pattern" or "it's good enough."
 - If you genuinely disagree, you must:
@@ -62,6 +64,7 @@ Use Cursor's built-in **Plan Mode** for planning complex features. There is no `
 - Do NOT silently skip findings.
 
 **Do not jump straight to editing.**
+
 - The FIRST tool call on a non-trivial implementation should be `dry-checker` (or Plan Mode for complex features), not `Write` or `StrReplace`.
 
 ## Pre-completion checklist

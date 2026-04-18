@@ -56,11 +56,11 @@ For each failing test:
 
 For every changed source file, verify a corresponding spec exists:
 
-| Source | Expected spec |
-|--------|---------------|
-| `apps/api/src/games/games.service.ts` | `apps/api/src/games/games.service.spec.ts` |
+| Source                                 | Expected spec                                               |
+| -------------------------------------- | ----------------------------------------------------------- |
+| `apps/api/src/games/games.service.ts`  | `apps/api/src/games/games.service.spec.ts`                  |
 | `apps/web/src/features/games/hooks.ts` | `apps/web/src/features/games/hooks.test.ts` (or `.spec.ts`) |
-| `packages/shared/src/game.ts` | `packages/shared/src/game.spec.ts` |
+| `packages/shared/src/game.ts`          | `packages/shared/src/game.spec.ts`                          |
 
 If a spec does not exist, this is a **BLOCKING** issue. The implementation is incomplete. In your report:
 

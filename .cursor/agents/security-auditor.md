@@ -23,7 +23,7 @@ MANDATORY when a change touches:
 
 ## Stack security context
 
-- **Api**: NestJS 11. Global `ValidationPipe` with `whitelist: true, forbidNonWhitelisted: true, transform: true` in `apps/api/src/main.ts`. Zod DTOs at the controller boundary (`.cursor/rules/zod-dto.mdc`). Drizzle ORM for DB access. `DATABASE_URL` validated by Zod at boot.
+- **Api**: NestJS 11. No global `ValidationPipe`; validation happens per-handler via `ZodValidationPipe` (`.cursor/rules/zod-dto.mdc`). `class-validator` / `class-transformer` are not dependencies. Drizzle ORM for DB access. `DATABASE_URL` validated by Zod at boot.
 - **Web**: Next.js 16 App Router. Server Actions and Route Handlers live inside `apps/web/src/app/**`. Axios client in `apps/web/src/lib/api.ts` uses `withCredentials: true`.
 - **CORS**: api allows `corsOrigin` from `AppConfigService` with `credentials: true`. Default `http://localhost:3000`.
 
@@ -33,7 +33,7 @@ MANDATORY when a change touches:
 
 - Are auth checks present on protected routes? Every non-public controller should use a guard (or middleware) — flag if missing.
 - Is session handling secure? HttpOnly, Secure, SameSite cookies for session tokens; short-lived access tokens; refresh rotation.
-- Authorization: is the *current user* allowed to perform the action on the *specific resource*? An auth-guarded endpoint that doesn't check ownership is still a vulnerability (IDOR).
+- Authorization: is the _current user_ allowed to perform the action on the _specific resource_? An auth-guarded endpoint that doesn't check ownership is still a vulnerability (IDOR).
 - Server Actions in Next 16 must be authenticated like API routes. Flag unauthenticated actions that mutate state.
 
 ### 2. Input validation
@@ -45,7 +45,7 @@ MANDATORY when a change touches:
 
 ### 3. SQL / injection
 
-- Drizzle's query builder is parameterized by default. Flag any raw `sql\`...${userInput}...\`` composition where `userInput` is not a bound parameter (tagged templates bind `${}` automatically — unsafe patterns are `sql.raw(\`... ${userInput} ...\`)` or string concatenation).
+- Drizzle's query builder is parameterized by default. Flag any raw `sql\`...${userInput}...\`` composition where `userInput` is not a bound parameter (tagged templates bind `${}`automatically — unsafe patterns are`sql.raw(\`... ${userInput} ...\`)` or string concatenation).
 - Dynamic table / column names from user input are always dangerous — `sql.identifier()` or an allow-list are the only acceptable patterns.
 - Any `db.execute(sql\`...\`)` call should be scrutinized.
 

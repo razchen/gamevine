@@ -34,13 +34,13 @@ New application? Put it in `apps/`. New library consumed by multiple apps? `pack
 
 ## Running commands in the right place
 
-| Intent | Command |
-|--------|---------|
-| Run everything | `pnpm dev` (root) |
-| Run just the web app | `pnpm dev:web` (root) |
-| Run just the api | `pnpm dev:api` (root) |
-| Execute inside one package | `pnpm --filter @gamevine/<pkg> <script>` |
-| Ad-hoc exec in a package | `pnpm --filter @gamevine/<pkg> exec <cmd>` |
+| Intent                     | Command                                    |
+| -------------------------- | ------------------------------------------ |
+| Run everything             | `pnpm dev` (root)                          |
+| Run just the web app       | `pnpm dev:web` (root)                      |
+| Run just the api           | `pnpm dev:api` (root)                      |
+| Execute inside one package | `pnpm --filter @gamevine/<pkg> <script>`   |
+| Ad-hoc exec in a package   | `pnpm --filter @gamevine/<pkg> exec <cmd>` |
 
 ## Forbidden
 

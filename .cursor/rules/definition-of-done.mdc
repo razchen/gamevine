@@ -10,10 +10,10 @@ A task is only "done" when **all** of the following hold. Passing `tsc` is the f
 ## The gauntlet (run from repo root)
 
 ```bash
-pnpm typecheck && pnpm lint && pnpm test
+pnpm typecheck && pnpm lint && pnpm test && pnpm format:check
 ```
 
-All three must exit 0. No exceptions. If a test was failing before your change and you didn't cause it, that still blocks done — fix it or surface it to the user.
+All four must exit 0. No exceptions. If a test was failing before your change and you didn't cause it, that still blocks done — fix it or surface it to the user. `pnpm format:check` is enforced locally via the pre-commit hook (`lint-staged` runs Prettier), so this should be a no-op — if it isn't, someone bypassed the hook and needs to run `pnpm format`.
 
 ## Code hygiene
 

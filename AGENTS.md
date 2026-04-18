@@ -4,13 +4,13 @@ Browser-based games and community-driven updates. Monorepo managed with pnpm wor
 
 ## Workspaces
 
-| Path | Package | Stack |
-|------|---------|-------|
-| `apps/web` | `@gamevine/web` | Next.js 16 (App Router), React 19, Tailwind v4, TanStack Query, axios |
-| `apps/api` | `@gamevine/api` | NestJS 11, Drizzle ORM, PostgreSQL, Zod |
-| `packages/shared` | `@gamevine/shared` | Cross-app types and constants (runtime-free) |
-| `packages/eslint-config` | `@gamevine/eslint-config` | Shared ESLint config |
-| `packages/tsconfig` | `@gamevine/tsconfig` | Shared TypeScript configs |
+| Path                     | Package                   | Stack                                                                 |
+| ------------------------ | ------------------------- | --------------------------------------------------------------------- |
+| `apps/web`               | `@gamevine/web`           | Next.js 16 (App Router), React 19, Tailwind v4, TanStack Query, axios |
+| `apps/api`               | `@gamevine/api`           | NestJS 11, Drizzle ORM, PostgreSQL, Zod                               |
+| `packages/shared`        | `@gamevine/shared`        | Cross-app types and constants (runtime-free)                          |
+| `packages/eslint-config` | `@gamevine/eslint-config` | Shared ESLint config                                                  |
+| `packages/tsconfig`      | `@gamevine/tsconfig`      | Shared TypeScript configs                                             |
 
 ## Golden commands (run from repo root)
 
@@ -19,7 +19,7 @@ pnpm install                        # install everything
 pnpm dev                            # run all dev servers via turbo
 pnpm dev:web                        # web only (port 3000)
 pnpm dev:api                        # api only
-pnpm typecheck && pnpm lint && pnpm test   # the pre-merge gauntlet
+pnpm typecheck && pnpm lint && pnpm test && pnpm format:check   # the pre-merge gauntlet
 pnpm format                         # prettier --write across the workspace
 ```
 
@@ -37,7 +37,7 @@ There is also one skill at `.cursor/skills/vercel-react-best-practices/` (Vercel
 
 ## Repo-specific reminders
 
-- **pnpm only.** A `preinstall` hook is not yet in place, but agents must still never reach for `npm` or `yarn`. Root deps use `-w`. Internal packages use `workspace:*`.
+- **pnpm only.** A root `preinstall` hook (`npx only-allow pnpm`) blocks `npm`/`yarn`/`bun`. Root deps use `-w`. Internal packages use `workspace:*`.
 - **Node `>=20.19`, pnpm `>=10`** (see `package.json` engines). Mismatched versions produce confusing errors.
 - **Next.js 16 is new.** Your training data is probably wrong about it. Read `apps/web/node_modules/next/dist/docs/` and call the Context7 MCP before writing Next code.
 - **Schema changes are a big deal.** Any change to `packages/shared/**` or `apps/api/**/*.schema.ts` must be cross-audited in both apps (see the `schema-sync` subagent).

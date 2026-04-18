@@ -27,9 +27,7 @@ pnpm-debug.log*
 # Editors / OS
 .DS_Store
 .idea/
-.vscode/*
-!.vscode/extensions.json
-!.vscode/settings.example.json
+.vscode/
 *.swp
 
 # TypeScript cache

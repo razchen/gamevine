@@ -21,7 +21,7 @@ Do **not** use me for production triage of a Sentry-captured issue — that's `s
 ## Stack context
 
 - `apps/web`: Next.js 16 App Router, React 19, TanStack Query, axios.
-- `apps/api`: NestJS 11, Drizzle ORM, PostgreSQL. Global `ValidationPipe`. `DRIZZLE` token for the DB.
+- `apps/api`: NestJS 11, Drizzle ORM, PostgreSQL. Per-handler `ZodValidationPipe` (no global `ValidationPipe`). `DRIZZLE` token for the DB.
 - `packages/shared`: isomorphic types / schemas. Bundled into browser via `transpilePackages`.
 
 ## Process

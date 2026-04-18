@@ -27,13 +27,13 @@ Use the full implementation pipeline (`.cursor/rules/agent-pipeline.mdc`) when:
 
 ## Required agents (run in order)
 
-| Step | Agent | Condition |
-|------|-------|-----------|
-| 1 | `code-reviewer` | Always |
-| 2 | `react-perf-reviewer` | If the diff touches any `.tsx` / `.jsx` file |
-| 3 | `dry-checker` | Always — new code often duplicates existing utilities |
-| 4 | `schema-sync` | If the diff touches `packages/shared/**` or `apps/api/**/*.schema.ts` |
-| 5 | `security-auditor` | If the diff touches auth, API routes, env handling, or DB queries |
+| Step | Agent                 | Condition                                                             |
+| ---- | --------------------- | --------------------------------------------------------------------- |
+| 1    | `code-reviewer`       | Always                                                                |
+| 2    | `react-perf-reviewer` | If the diff touches any `.tsx` / `.jsx` file                          |
+| 3    | `dry-checker`         | Always — new code often duplicates existing utilities                 |
+| 4    | `schema-sync`         | If the diff touches `packages/shared/**` or `apps/api/**/*.schema.ts` |
+| 5    | `security-auditor`    | If the diff touches auth, API routes, env handling, or DB queries     |
 
 ## Agents to skip in review-only mode
 

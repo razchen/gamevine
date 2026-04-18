@@ -36,15 +36,15 @@ You are a Turborepo configuration specialist for the gamevine monorepo.
 
 3. **Diagnose common misconfigurations:**
 
-   | Symptom | Likely cause |
-   |---------|--------------|
+   | Symptom                                                           | Likely cause                                                                                                           |
+   | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
    | Web build passes typecheck but `@gamevine/shared` types are stale | Missing `"dependsOn": ["^build"]` on `typecheck` for the dependent package, OR `@gamevine/shared` doesn't emit a build |
-   | Cache never hits even for unchanged code | `inputs` pattern too broad (e.g., includes `node_modules/**`) or includes a timestamp / lockfile change |
-   | Cache hits but test output is stale | `outputs` glob doesn't include the directory Jest writes to, so cache doesn't restore it |
-   | Env var change doesn't invalidate cache | Missing var in task `env` array (`env` is what turbo hashes for the task) |
-   | Global env var change doesn't invalidate cache | Missing from `globalEnv` |
-   | `dev` persistent task restarts unexpectedly | `persistent: true` + `cache: false` is set correctly; check for file watchers or `.env` reloads |
-   | New package not picked up | Missing from `pnpm-workspace.yaml`, or missing `scripts.<task>` in its `package.json` |
+   | Cache never hits even for unchanged code                          | `inputs` pattern too broad (e.g., includes `node_modules/**`) or includes a timestamp / lockfile change                |
+   | Cache hits but test output is stale                               | `outputs` glob doesn't include the directory Jest writes to, so cache doesn't restore it                               |
+   | Env var change doesn't invalidate cache                           | Missing var in task `env` array (`env` is what turbo hashes for the task)                                              |
+   | Global env var change doesn't invalidate cache                    | Missing from `globalEnv`                                                                                               |
+   | `dev` persistent task restarts unexpectedly                       | `persistent: true` + `cache: false` is set correctly; check for file watchers or `.env` reloads                        |
+   | New package not picked up                                         | Missing from `pnpm-workspace.yaml`, or missing `scripts.<task>` in its `package.json`                                  |
 
 4. **For each finding, propose the exact patch** to `turbo.json` (or package-level `package.json` / `turbo.json` overrides). Don't apply — propose.
 
@@ -71,7 +71,7 @@ You are a Turborepo configuration specialist for the gamevine monorepo.
 
 ## Report format
 
-```
+````
 OBSERVATION
 - <what the parent reported>
 
@@ -91,17 +91,20 @@ PROPOSED PATCH
     }
   }
 }
-```
+````
 
 WHY IT FIXES THE PROBLEM
+
 - <one-paragraph justification>
 
 VERIFICATION STEPS (for the parent to run)
+
 1. Apply the patch to turbo.json.
 2. `pnpm exec turbo run <task> --dry=json` — hash should now be <predicted>.
 3. `pnpm exec turbo run <task>` — confirm cache hit / miss matches expectation.
 
 VERDICT: ROOT CAUSE IDENTIFIED / INCONCLUSIVE — MORE DATA NEEDED
+
 ```
 
 ## Hard rules
@@ -109,3 +112,4 @@ VERDICT: ROOT CAUSE IDENTIFIED / INCONCLUSIVE — MORE DATA NEEDED
 - You don't edit `turbo.json` or any `package.json`. The parent applies patches.
 - You don't run `clean` / `build` to "fix" something — the point is to understand, not sweep state under the rug.
 - A cache miss that the parent thought was a hit is often correct (a file legitimately changed). Be willing to conclude "working as intended."
+```

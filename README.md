@@ -11,15 +11,15 @@ ESLint 10 flat config, Prettier 3, TypeScript 6). No product features yet.
 
 ## Stack
 
-| Area            | Tool / Version                                                                 |
-| --------------- | ------------------------------------------------------------------------------ |
-| Monorepo        | pnpm 10.33 workspaces + Turborepo 2.9                                          |
-| Language        | TypeScript 6                                                                   |
-| Frontend        | Next.js 16 (App Router, Turbopack), React 19.2, Tailwind CSS 4.2, shadcn/ui    |
-| Data fetching   | TanStack Query 5 (the library formerly known as React Query) + Axios          |
-| Backend         | NestJS 11 on Express, zod-validated config                                     |
-| Database / ORM  | PostgreSQL 15+ (local) + Drizzle ORM 0.45 (`node-postgres` driver)             |
-| Linting / style | ESLint 10 (flat config), `typescript-eslint` 8, Prettier 3.8                   |
+| Area            | Tool / Version                                                              |
+| --------------- | --------------------------------------------------------------------------- |
+| Monorepo        | pnpm 10.33 workspaces + Turborepo 2.9                                       |
+| Language        | TypeScript 6                                                                |
+| Frontend        | Next.js 16 (App Router, Turbopack), React 19.2, Tailwind CSS 4.2, shadcn/ui |
+| Data fetching   | TanStack Query 5 (the library formerly known as React Query) + Axios        |
+| Backend         | NestJS 11 on Express, zod-validated config                                  |
+| Database / ORM  | PostgreSQL 15+ (local) + Drizzle ORM 0.45 (`node-postgres` driver)          |
+| Linting / style | ESLint 10 (flat config), `typescript-eslint` 8, Prettier 3.8                |
 
 ---
 
@@ -53,6 +53,9 @@ gamevine/
 ## Quickstart
 
 ```bash
+# 0. Pin Node to the version in .nvmrc (Node >=20.19)
+nvm use                                    # or: corepack enable
+
 # 1. Install dependencies
 pnpm install
 
@@ -98,15 +101,15 @@ Run at the repo root; Turborepo fans out to each workspace in parallel.
 
 ### API-specific (run inside `apps/api` or with `pnpm --filter @gamevine/api <script>`)
 
-| Command          | What it does                                 |
-| ---------------- | -------------------------------------------- |
-| `dev`            | `nest start --watch`                         |
-| `build`          | `nest build`                                 |
-| `start`          | Run the compiled server from `dist/main.js`  |
-| `db:generate`    | Generate SQL migrations from Drizzle schema  |
-| `db:migrate`     | Apply generated migrations                   |
-| `db:push`        | Push schema directly to the DB (dev only)    |
-| `db:studio`      | Open Drizzle Studio                          |
+| Command       | What it does                                |
+| ------------- | ------------------------------------------- |
+| `dev`         | `nest start --watch`                        |
+| `build`       | `nest build`                                |
+| `start`       | Run the compiled server from `dist/main.js` |
+| `db:generate` | Generate SQL migrations from Drizzle schema |
+| `db:migrate`  | Apply generated migrations                  |
+| `db:push`     | Push schema directly to the DB (dev only)   |
+| `db:studio`   | Open Drizzle Studio                         |
 
 ---
 
@@ -114,13 +117,13 @@ Run at the repo root; Turborepo fans out to each workspace in parallel.
 
 Documented in full in [`.env.example`](.env.example). Summary:
 
-| Variable              | Consumer | Purpose                                     |
-| --------------------- | -------- | ------------------------------------------- |
-| `NODE_ENV`            | both     | `development` \| `test` \| `production`     |
-| `DATABASE_URL`        | api      | Postgres connection string                  |
-| `PORT`                | api      | HTTP port the Nest server binds             |
-| `CORS_ORIGIN`         | api      | Allowed browser origin                      |
-| `NEXT_PUBLIC_API_URL` | web      | Base URL the web app uses to reach the API  |
+| Variable              | Consumer | Purpose                                    |
+| --------------------- | -------- | ------------------------------------------ |
+| `NODE_ENV`            | both     | `development` \| `test` \| `production`    |
+| `DATABASE_URL`        | api      | Postgres connection string                 |
+| `PORT`                | api      | HTTP port the Nest server binds            |
+| `CORS_ORIGIN`         | api      | Allowed browser origin                     |
+| `NEXT_PUBLIC_API_URL` | web      | Base URL the web app uses to reach the API |
 
 Each app also has its own example file (`apps/api/.env.example`,
 `apps/web/.env.local.example`) for locality. `.env*` files are gitignored
@@ -136,8 +139,11 @@ except for `*.example` / `*.local.example`.
   resolution on api.
 - **`@gamevine/tsconfig`** — `base.json`, `nextjs.json`, `nestjs.json`,
   `react-library.json`. Extend these from each workspace's `tsconfig.json`.
-- **`@gamevine/eslint-config`** — flat-config exports (`base`, `next`, `nest`)
-  that each app's `eslint.config.{js,mjs}` composes.
+- **`@gamevine/eslint-config`** — flat-config exports (`base`, `nest`) that
+  `apps/api` and `packages/shared` compose. `apps/web` uses
+  `eslint-config-next`'s `core-web-vitals` and `typescript` sub-paths directly
+  alongside `@gamevine/eslint-config/base` — the idiomatic Next 16 flat-config
+  pattern now that `next lint` is removed.
 
 ---
 

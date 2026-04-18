@@ -18,12 +18,15 @@ Use [Conventional Commits](https://www.conventionalcommits.org/). Minimum form:
 - **subject**: imperative mood, lowercase, no trailing period, <=72 chars.
 
 Examples:
+
 - `feat(api): add /games/:id/invite endpoint`
 - `fix(web): await params in route handlers`
 - `chore(deps): bump drizzle-orm to 0.46`
 - `refactor(shared): extract Game type from api`
 
-Body (optional) explains *why*. Wrap at 80 chars. Reference issues/PRs at the bottom.
+Body (optional) explains _why_. Wrap at 80 chars. Reference issues/PRs at the bottom.
+
+**Locally enforced.** A `commit-msg` hook runs `commitlint` against `@commitlint/config-conventional`; non-conforming messages are rejected at commit time. A `pre-commit` hook runs `lint-staged` (Prettier on staged files) and a `pre-push` hook runs `pnpm typecheck && pnpm lint`. Hooks are installed by `simple-git-hooks` via the root `postinstall` script — they wire themselves on `pnpm install`.
 
 ## Branches
 
@@ -36,11 +39,11 @@ Body (optional) explains *why*. Wrap at 80 chars. Reference issues/PRs at the bo
 - Title = commit-message style (`feat(web): add leaderboard page`).
 - Body must cover: what changed, why, how it was verified (commands run, browser paths exercised). Link the Sentry issue or ticket if applicable.
 - Screenshots / gifs for any UI change. Non-negotiable.
-- Run the gauntlet locally before opening: `pnpm typecheck && pnpm lint && pnpm test`.
+- Run the gauntlet locally before opening: `pnpm typecheck && pnpm lint && pnpm test && pnpm format:check`.
 
 ## Forbidden
 
-- `--no-verify` on commit or push. If a hook is failing, fix the cause.
+- `--no-verify` on commit or push. Hooks are enforced; if a hook is failing, fix the cause.
 - `git push --force` (only `--force-with-lease` is ever acceptable, and never against `main`).
 - `git commit --amend` after pushing to a shared branch.
 - Committing generated files that belong in `.gitignore` (dist, `.next`, coverage, `.turbo`).

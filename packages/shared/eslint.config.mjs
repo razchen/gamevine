@@ -1,3 +1,3 @@
-import { baseConfig } from '@gamevine/eslint-config/base';
+import { isomorphicConfig } from '@gamevine/eslint-config/isomorphic';
 
-export default baseConfig;
+export default isomorphicConfig;

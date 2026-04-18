@@ -23,8 +23,12 @@ export class AppConfigService {
     return this.config.get('DATABASE_URL', { infer: true });
   }
 
-  get corsOrigin(): string {
+  get corsOrigin(): string[] {
     return this.config.get('CORS_ORIGIN', { infer: true });
+  }
+
+  get sentryDsn(): string | undefined {
+    return this.config.get('SENTRY_DSN', { infer: true });
   }
 
   get isProduction(): boolean {

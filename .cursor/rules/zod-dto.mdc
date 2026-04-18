@@ -8,7 +8,7 @@ alwaysApply: false
 
 ## Why Zod, not class-validator
 
-This repo uses Zod for all request/response validation. One schema source, runtime-checked, types inferred with `z.infer`, and the same schemas can be published to `@gamevine/shared` so the web app gets the exact shape for free. Nest's global `ValidationPipe` (configured in `main.ts`) is still on, but it only fires on `class-validator` decorators — which we don't use — so it's effectively a no-op safety net.
+This repo uses Zod for all request/response validation. One schema source, runtime-checked, types inferred with `z.infer`, and the same schemas can be published to `@gamevine/shared` so the web app gets the exact shape for free. There is **no** global `ValidationPipe` — `class-validator` and `class-transformer` are not dependencies. Validation happens per-handler via `ZodValidationPipe` (see below).
 
 ## Where DTOs live
 
@@ -90,7 +90,11 @@ create(
 {
   "statusCode": 400,
   "message": [
-    { "path": ["name"], "code": "too_small", "message": "String must contain at least 1 character(s)" }
+    {
+      "path": ["name"],
+      "code": "too_small",
+      "message": "String must contain at least 1 character(s)"
+    }
   ]
 }
 ```

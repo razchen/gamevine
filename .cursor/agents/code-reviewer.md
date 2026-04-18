@@ -35,7 +35,7 @@ You are a senior code reviewer for the gamevine codebase.
   - The computation is genuinely expensive (not an object literal, not simple math).
   - Dependencies actually change independently of the render.
   - The value is passed to a child wrapped in `React.memo`.
-  - If you can't articulate *why*, it doesn't belong.
+  - If you can't articulate _why_, it doesn't belong.
 
 ### 3. Readability
 
@@ -48,7 +48,7 @@ You are a senior code reviewer for the gamevine codebase.
   - It uses no browser APIs.
   - Its parent is already a client component.
   - It only forwards function props to interactive children.
-  `"use client"` marks a boundary between server and client, not every interactive leaf.
+    `"use client"` marks a boundary between server and client, not every interactive leaf.
 - **`forwardRef` in new React 19 code** — `ref` is a regular prop now.
 
 ### 4. Maintainability

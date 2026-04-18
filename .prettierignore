@@ -8,3 +8,5 @@ pnpm-lock.yaml
 *.tsbuildinfo
 apps/api/drizzle
 apps/web/.next
+apps/web/next-env.d.ts
+

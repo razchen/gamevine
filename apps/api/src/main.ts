@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
@@ -15,13 +15,8 @@ async function bootstrap(): Promise<void> {
     credentials: true,
   });
 
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-    }),
-  );
+  // Validation is per-handler via ZodValidationPipe (see .cursor/rules/zod-dto.mdc).
+  // No global ValidationPipe — class-validator / class-transformer are not used.
 
   app.enableShutdownHooks();
 

@@ -18,7 +18,7 @@ alwaysApply: false
 ## Server vs client components
 
 - **Server Components are the default.** Don't add `"use client"` unless you genuinely need hooks, event handlers, or browser APIs.
-- `"use client"` marks a *boundary*, not a per-component attribute. Once a subtree is client, its children don't need their own directive.
+- `"use client"` marks a _boundary_, not a per-component attribute. Once a subtree is client, its children don't need their own directive.
 - Do not put `"use client"` on leaf interactive components when a parent is already client.
 - Server Components can be `async` and `await` data directly. Do this instead of a `useEffect + setState` dance.
 
@@ -46,10 +46,7 @@ Forgetting the `await` is the single most common Next-16-specific bug LLMs produ
 
 ```ts
 // apps/web/src/app/games/[id]/route.ts
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   // ...
   return Response.json({ id });

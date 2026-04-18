@@ -13,9 +13,9 @@ Tailwind v4 is configured in **CSS**, not JS. The single source of truth is `app
 Key pieces of `globals.css`:
 
 ```css
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
 @custom-variant dark (&:is(.dark *));
 
