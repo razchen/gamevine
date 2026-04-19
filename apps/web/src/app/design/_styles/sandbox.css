@@ -1,0 +1,254 @@
+/*
+ * Design Sandbox theme tokens.
+ *
+ * Three candidate themes (classy, editorial, dark-first) mapped to a single
+ * semantic token set. Each theme is monochrome-dominant with exactly two
+ * restrained accents: `--color-gv-accent` for CTAs and `--color-gv-credits`
+ * (aliased to `--color-gv-accent-2`) for credit amounts / currency.
+ *
+ * Switching themes is a pure CSS-variable swap keyed off `[data-theme="..."]`
+ * on the sandbox wrapper element (rendered by ThemeProvider); light/dark is
+ * the `.dark` class on the same element. Compound selectors like
+ * `[data-theme='X'].dark` require both to live on one element, which is why
+ * the provider owns the wrapper div.
+ *
+ * Tokens are prefixed `--color-gv-*` to avoid shadowing shadcn's tokens
+ * (--background, --primary, etc.) in globals.css. Thin utility classes in
+ * @layer utilities wrap the most common pairings so JSX stays readable.
+ *
+ * Only the sandbox imports this file (via apps/web/src/app/design/layout.tsx)
+ * so production routes are untouched.
+ */
+
+/* -------------------------------------------------------------------------- */
+/* Typography axis (font toggle)                                              */
+/* -------------------------------------------------------------------------- */
+
+[data-font='geist'] {
+  --font-gv-sans: var(--font-geist-sans);
+}
+[data-font='jakarta'] {
+  --font-gv-sans: var(--font-plus-jakarta);
+}
+[data-font='grotesk'] {
+  --font-gv-sans: var(--font-space-grotesk);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Density axis                                                               */
+/* -------------------------------------------------------------------------- */
+
+[data-density='comfortable'] {
+  --gv-density: 1;
+}
+[data-density='compact'] {
+  --gv-density: 0.85;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Theme 1 — Graphite (cool neutrals + indigo CTA + amber credits)            */
+/*   Technical, precise, Linear-adjacent. Ink-blue undertone.                 */
+/* -------------------------------------------------------------------------- */
+
+[data-theme='graphite'] {
+  --color-gv-bg: oklch(0.99 0.003 255);
+  --color-gv-surface: oklch(1 0 0);
+  --color-gv-surface-muted: oklch(0.97 0.005 255);
+  --color-gv-border: oklch(0.9 0.01 255);
+  --color-gv-text: oklch(0.22 0.02 255);
+  --color-gv-text-muted: oklch(0.48 0.02 255);
+  --color-gv-accent: oklch(0.48 0.14 260);
+  --color-gv-accent-fg: oklch(0.99 0 0);
+  --color-gv-accent-2: oklch(0.58 0.14 80);
+  --color-gv-success: oklch(0.52 0.1 150);
+  --color-gv-warning: oklch(0.62 0.13 75);
+  --color-gv-danger: oklch(0.55 0.15 25);
+  --color-gv-credits: oklch(0.58 0.14 80);
+  --gv-radius: 0.5rem;
+}
+
+[data-theme='graphite'].dark {
+  --color-gv-bg: oklch(0.145 0.012 255);
+  --color-gv-surface: oklch(0.185 0.012 255);
+  --color-gv-surface-muted: oklch(0.23 0.012 255);
+  --color-gv-border: oklch(0.3 0.012 255);
+  --color-gv-text: oklch(0.96 0.005 255);
+  --color-gv-text-muted: oklch(0.64 0.015 255);
+  --color-gv-accent: oklch(0.7 0.14 260);
+  --color-gv-accent-fg: oklch(0.14 0.012 255);
+  --color-gv-accent-2: oklch(0.8 0.13 85);
+  --color-gv-success: oklch(0.7 0.08 150);
+  --color-gv-warning: oklch(0.78 0.1 80);
+  --color-gv-danger: oklch(0.64 0.13 25);
+  --color-gv-credits: oklch(0.8 0.13 85);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Theme 2 — Ember (warm charcoal + muted violet CTA + gold credits)          */
+/*   Editorial, premium publication after dark. Stripe-at-night homage.       */
+/* -------------------------------------------------------------------------- */
+
+[data-theme='ember'] {
+  --color-gv-bg: oklch(0.985 0.005 80);
+  --color-gv-surface: oklch(1 0 0);
+  --color-gv-surface-muted: oklch(0.97 0.008 75);
+  --color-gv-border: oklch(0.89 0.012 60);
+  --color-gv-text: oklch(0.24 0.015 40);
+  --color-gv-text-muted: oklch(0.5 0.02 50);
+  --color-gv-accent: oklch(0.46 0.16 300);
+  --color-gv-accent-fg: oklch(1 0 0);
+  --color-gv-accent-2: oklch(0.58 0.13 85);
+  --color-gv-success: oklch(0.52 0.09 150);
+  --color-gv-warning: oklch(0.6 0.12 75);
+  --color-gv-danger: oklch(0.55 0.15 22);
+  --color-gv-credits: oklch(0.58 0.13 85);
+  --gv-radius: 0.5rem;
+}
+
+[data-theme='ember'].dark {
+  --color-gv-bg: oklch(0.155 0.01 45);
+  --color-gv-surface: oklch(0.205 0.01 45);
+  --color-gv-surface-muted: oklch(0.25 0.01 45);
+  --color-gv-border: oklch(0.31 0.012 45);
+  --color-gv-text: oklch(0.96 0.005 75);
+  --color-gv-text-muted: oklch(0.66 0.015 60);
+  --color-gv-accent: oklch(0.62 0.14 300);
+  --color-gv-accent-fg: oklch(0.98 0.005 75);
+  --color-gv-accent-2: oklch(0.78 0.11 85);
+  --color-gv-success: oklch(0.7 0.08 150);
+  --color-gv-warning: oklch(0.78 0.11 75);
+  --color-gv-danger: oklch(0.64 0.13 22);
+  --color-gv-credits: oklch(0.78 0.11 85);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Theme 3 — Obsidian (pure monochrome + deep plum CTA + bronze credits)      */
+/*   The most restrained. Zero chroma in neutrals, color only on actions.     */
+/* -------------------------------------------------------------------------- */
+
+[data-theme='obsidian'] {
+  --color-gv-bg: oklch(0.98 0 0);
+  --color-gv-surface: oklch(1 0 0);
+  --color-gv-surface-muted: oklch(0.96 0 0);
+  --color-gv-border: oklch(0.88 0 0);
+  --color-gv-text: oklch(0.18 0 0);
+  --color-gv-text-muted: oklch(0.48 0 0);
+  --color-gv-accent: oklch(0.4 0.16 350);
+  --color-gv-accent-fg: oklch(1 0 0);
+  --color-gv-accent-2: oklch(0.55 0.11 65);
+  --color-gv-success: oklch(0.52 0.09 155);
+  --color-gv-warning: oklch(0.58 0.11 75);
+  --color-gv-danger: oklch(0.55 0.14 25);
+  --color-gv-credits: oklch(0.55 0.11 65);
+  --gv-radius: 0.375rem;
+}
+
+[data-theme='obsidian'].dark {
+  --color-gv-bg: oklch(0.125 0 0);
+  --color-gv-surface: oklch(0.18 0 0);
+  --color-gv-surface-muted: oklch(0.22 0 0);
+  --color-gv-border: oklch(0.3 0 0);
+  --color-gv-text: oklch(0.96 0 0);
+  --color-gv-text-muted: oklch(0.62 0 0);
+  --color-gv-accent: oklch(0.56 0.14 350);
+  --color-gv-accent-fg: oklch(0.98 0 0);
+  --color-gv-accent-2: oklch(0.72 0.09 65);
+  --color-gv-success: oklch(0.68 0.07 155);
+  --color-gv-warning: oklch(0.75 0.09 75);
+  --color-gv-danger: oklch(0.62 0.13 25);
+  --color-gv-credits: oklch(0.72 0.09 65);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Utilities — keyed off the tokens above. Using @layer utilities so they     */
+/* compose predictably with other Tailwind utilities via tailwind-merge.      */
+/* -------------------------------------------------------------------------- */
+
+@layer utilities {
+  .gv-bg {
+    background-color: var(--color-gv-bg);
+    color: var(--color-gv-text);
+  }
+  .gv-surface {
+    background-color: var(--color-gv-surface);
+    color: var(--color-gv-text);
+  }
+  .gv-surface-muted {
+    background-color: var(--color-gv-surface-muted);
+    color: var(--color-gv-text);
+  }
+  .gv-text {
+    color: var(--color-gv-text);
+  }
+  .gv-text-muted {
+    color: var(--color-gv-text-muted);
+  }
+  .gv-border {
+    border-color: var(--color-gv-border);
+  }
+  .gv-accent {
+    background-color: var(--color-gv-accent);
+    color: var(--color-gv-accent-fg);
+  }
+  .gv-accent-text {
+    color: var(--color-gv-accent);
+  }
+  .gv-accent-2-text {
+    color: var(--color-gv-accent-2);
+  }
+  .gv-accent-ring {
+    --tw-ring-color: var(--color-gv-accent);
+  }
+  .gv-success {
+    color: var(--color-gv-success);
+  }
+  .gv-warning {
+    color: var(--color-gv-warning);
+  }
+  .gv-danger {
+    color: var(--color-gv-danger);
+  }
+  .gv-credits {
+    color: var(--color-gv-credits);
+    font-variant-numeric: tabular-nums;
+  }
+  .gv-chip-success {
+    background-color: color-mix(in oklch, var(--color-gv-success) 18%, transparent);
+    color: var(--color-gv-success);
+  }
+  .gv-chip-warning {
+    background-color: color-mix(in oklch, var(--color-gv-warning) 20%, transparent);
+    color: var(--color-gv-warning);
+  }
+  .gv-chip-danger {
+    background-color: color-mix(in oklch, var(--color-gv-danger) 18%, transparent);
+    color: var(--color-gv-danger);
+  }
+  .gv-chip-accent {
+    background-color: color-mix(in oklch, var(--color-gv-accent) 18%, transparent);
+    color: var(--color-gv-accent);
+  }
+  .gv-chip-credits {
+    background-color: color-mix(in oklch, var(--color-gv-credits) 22%, transparent);
+    color: var(--color-gv-credits);
+  }
+  .gv-font {
+    font-family: var(--font-gv-sans), ui-sans-serif, system-ui, sans-serif;
+  }
+  .gv-rounded {
+    border-radius: var(--gv-radius, 0.5rem);
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Pre-hydration baseline — applies before JS sets the toggle. Prevents FOUC. */
+/* The ThemeProvider wrapper owns data-theme / .dark / font / density at      */
+/* runtime; this class paints the background + base text + font family so the */
+/* first frame matches the chosen theme.                                      */
+/* -------------------------------------------------------------------------- */
+
+.gv-sandbox-root {
+  background-color: var(--color-gv-bg);
+  color: var(--color-gv-text);
+  font-family: var(--font-gv-sans), ui-sans-serif, system-ui, sans-serif;
+}
