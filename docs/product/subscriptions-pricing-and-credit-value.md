@@ -52,6 +52,7 @@
 
 - The commercial model must stay easy to understand at launch.
 - Credit value should be explained in terms of **what users can do**, not with low-level cost breakdowns.
+- For features and bug fixes, the platform should also show an **AI-estimated credit range** before work starts so users understand the likely spend attached to implementation.
 - Subscriptions should have a clear relationship to credits rather than creating a second confusing economy.
 - Commercial packaging should reinforce the core loop: **create a game → submit ideas → fund roadmap items → ship updates**.
 - **Playing games is free** at launch.
@@ -67,6 +68,7 @@
   - **Creator**: `10%` lower fees on idea submission and roadmap funding
   - **Creator Pro**: `20%` lower fees on idea submission and roadmap funding
 - Credit value should be explained with **mixed framing**: what users can do with credits and what different plans/packages are good for.
+- Feature and bug-fix estimates should use a **high-confidence margin** rather than a best-case point estimate; launch guidance should target a quote that covers roughly **90%** of normal runs for that job type.
 - Included monthly credits should **reset each billing cycle** and should **not roll over** at launch.
 - Purchased top-up credits should remain in the wallet, but spending them still requires an **active subscription**.
 - No annual plans should exist at launch; keep the launch commercial model monthly and simple.
@@ -78,6 +80,7 @@
 - Pricing surfaces should make the launch tier ladder clear: free play, participation tier, and creator tier(s).
 - The product should clearly explain which actions are unavailable without a subscription.
 - Pricing pages should show both **tier comparison** and **credit-action examples** so users can reason about value quickly.
+- Feature and bug-fix pricing surfaces should present an **estimated credit range** with clear wording that it is a forecast based on engine choice and file context, not a guaranteed exact final bill.
 
 # Backend Notes
 
@@ -95,11 +98,13 @@
 - Value confusion when different AI engines lead to different credit targets.
 - Users misunderstanding the difference between the supporter tier and creator tiers.
 - Users canceling a subscription while still holding purchased top-up credits.
+- Users seeing an estimate and assuming it is an exact promise instead of a **90%-margin** forecast.
 
 # Open Questions
 
 - How hard should the product push upgrades from **Supporter** to **Creator** when a user tries to start game creation?
 - Should there be any credit gifting or creator sponsorship mechanics later, or stay strictly direct purchase only?
+- How should the product handle the uncommon case where a real run exceeds the quoted **90%-margin** estimate?
 
 # Suggested Epics
 
@@ -107,6 +112,7 @@
 - Define how pricing/value is presented across public and in-app surfaces.
 - Define the relationship between recurring access and credit-based actions.
 - Define the launch subscription tier ladder and the rights unlocked by each tier.
+- Define how implementation cost estimates are surfaced for features and bug fixes.
 
 # Suggested Tickets
 
@@ -114,3 +120,4 @@
 - Define the monthly credit reset behavior and lower-fee benefits by tier.
 - Define the launch top-up credit packages for active subscribers.
 - Define how the product explains credit value to creators and players.
+- Define how the platform calculates and presents feature/bug-fix credit estimates with a target **90% confidence margin**.
