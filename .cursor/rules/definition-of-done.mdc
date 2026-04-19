@@ -29,12 +29,12 @@ All four must exit 0. No exceptions. If a test was failing before your change an
 
 - Modifies `packages/shared/**` → run the `schema-sync` subagent; confirm both apps still typecheck and, where the contract is exercised, the runtime path still works.
 - Modifies `apps/api/**/*.schema.ts` or any Drizzle schema → `pnpm --filter @gamevine/api db:generate`, review the SQL, migrate locally, confirm a representative query.
-- Modifies `apps/web` routes or data-fetching → run the `e2e-smoke` subagent or drive the page manually via the browser MCP.
+- Modifies `apps/web` routes or data-fetching → drive the page manually via the browser MCP (or have the user verify). A clean typecheck does not prove the data flowed.
 - Modifies auth / API routes / env handling → run the `security-auditor` subagent.
 
 ## The agent pipeline
 
-This repo enforces a sequential agent pipeline after implementation (`code-reviewer`, `react-perf-reviewer` if `.tsx`/`.jsx` touched, `test-runner`, `dry-checker`, etc.). See `.cursor/rules/agent-pipeline.mdc`. Running the pipeline is part of done. Dismissing an agent's recommendation is not.
+This repo enforces a sequential agent pipeline after implementation (`code-reviewer`, `react-perf-reviewer` if `.tsx`/`.jsx` touched, `test-runner`, plus `schema-sync` / `security-auditor` when relevant). See `.cursor/rules/agent-pipeline.mdc`. Running the mandatory agents is part of done. Dismissing an agent's recommendation is not.
 
 ## What "done" is NOT
 

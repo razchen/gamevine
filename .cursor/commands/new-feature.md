@@ -14,7 +14,7 @@ Follow the implementation pipeline (`.cursor/rules/agent-pipeline.mdc`). Do not 
    - Does the web app consume it? (If yes, DTOs go in `@gamevine/shared`; a TanStack Query hook is generated.)
    - Does the web app need a visible route? (If yes, scaffold at the appropriate App Router path.)
 
-2. **`dry-checker`** — check for duplication before creating anything.
+2. **`dry-checker`** (optional) — if this is new utility / new component family / large-refactor territory, run a duplication check first. Skip for small contained features.
 
 3. **`nest-feature`** — scaffold the api module (controller + service + DTO + specs + optional schema). Wire it into `AppModule`.
 
@@ -26,8 +26,8 @@ Follow the implementation pipeline (`.cursor/rules/agent-pipeline.mdc`). Do not 
 
 7. **`schema-sync`** — if `@gamevine/shared` was touched.
 
-8. **`code-reviewer`** + **`react-perf-reviewer`** (if `.tsx` added) + **`test-runner`** + **`dry-checker`** (second pass) + **`lint-typecheck-fixer`**.
+8. **`code-reviewer`** + **`react-perf-reviewer`** (if `.tsx` added) + **`test-runner`** + **`lint-typecheck-fixer`**.
 
-9. **`e2e-smoke`** — if a web route was added and the dev servers are up.
+9. Manually verify the new surface works at runtime — drive it via the browser MCP or hit the api endpoint. Typecheck green is the floor, not the ceiling.
 
 Scaffolding produces skeletons, NOT real business logic. Do not claim the feature is "done" — explicitly tell me what's left for a human to implement.

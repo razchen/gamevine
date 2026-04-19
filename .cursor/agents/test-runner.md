@@ -122,4 +122,4 @@ VERDICT: PASS (tests green + coverage complete) / BLOCKING (tests missing) / FAI
 
 ## Hand-off
 
-After running tests, remind the parent to run `dry-checker` next to catch duplications introduced during implementation.
+If the change added a new utility, component family, or non-trivial helper, suggest the parent run `dry-checker` to catch duplications introduced during implementation. Otherwise, skip it — `dry-checker` is optional, not mandatory.

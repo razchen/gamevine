@@ -1,5 +1,5 @@
 ---
-description: Mandatory pipeline for reviewing existing code (diffs, PRs, branches) without implementing.
+description: Pipeline for reviewing existing code (diffs, PRs, branches) without implementing.
 alwaysApply: true
 ---
 
@@ -31,9 +31,12 @@ Use the full implementation pipeline (`.cursor/rules/agent-pipeline.mdc`) when:
 | ---- | --------------------- | --------------------------------------------------------------------- |
 | 1    | `code-reviewer`       | Always                                                                |
 | 2    | `react-perf-reviewer` | If the diff touches any `.tsx` / `.jsx` file                          |
-| 3    | `dry-checker`         | Always — new code often duplicates existing utilities                 |
-| 4    | `schema-sync`         | If the diff touches `packages/shared/**` or `apps/api/**/*.schema.ts` |
-| 5    | `security-auditor`    | If the diff touches auth, API routes, env handling, or DB queries     |
+| 3    | `schema-sync`         | If the diff touches `packages/shared/**` or `apps/api/**/*.schema.ts` |
+| 4    | `security-auditor`    | If the diff touches auth, API routes, env handling, or DB queries     |
+
+## Optional agents
+
+- `dry-checker` — run when the diff adds a new utility, component family, or non-trivial helper. Skip for small bug fixes or self-contained feature tweaks where duplication is implausible.
 
 ## Agents to skip in review-only mode
 
@@ -41,7 +44,6 @@ Unless the user explicitly asks for them:
 
 - `test-runner` — user can request separately; running tests for a review is often noise.
 - `lint-typecheck-fixer` — the user hasn't asked you to change code; flag lint/type issues through `code-reviewer` instead.
-- `e2e-smoke` — reviewer doesn't own the change.
 - Scaffolders (`nest-feature`, `web-route`) — not applicable.
 - `drizzle-migrations` — review the SQL inline via `code-reviewer` instead.
 
@@ -62,8 +64,8 @@ User: "Review the diff against main."
 ```
 1. code-reviewer        → quality, performance, correctness, patterns
 2. react-perf-reviewer  → IF .tsx/.jsx in diff
-3. dry-checker          → find duplications in new code
-4. schema-sync          → IF packages/shared/** or schemas changed
-5. security-auditor     → IF auth/API/env/DB touched
+3. schema-sync          → IF packages/shared/** or schemas changed
+4. security-auditor     → IF auth/API/env/DB touched
+(optional) dry-checker  → if the diff adds a new utility or component family
 → Consolidated verdict with severity-sorted findings
 ```

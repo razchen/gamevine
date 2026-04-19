@@ -36,14 +36,14 @@ Follow the rules:
    - Does it fetch data server-side (Server Component + `await`) or client-side (TanStack Query hook)?
    - Does it need auth? If so, which guard strategy applies (middleware, server check, client redirect)?
 
-2. **Check for duplication.** Invoke `dry-checker` or search: is there a similar page? An existing component under `apps/web/src/components/ui/` that should be reused?
+2. **Check for duplication.** A quick Grep / Glob is usually enough: is there a similar page? An existing component under `apps/web/src/components/ui/` that should be reused? For larger surfaces, `dry-checker` is available.
 
 3. **Generate files** using the templates below, filled in for the route.
 
 4. **Verify:**
    - Run `pnpm --filter @gamevine/web typecheck` — must be green. Typed routes (`experimental.typedRoutes: true` in `next.config.ts`) will catch bad `<Link>` hrefs.
    - Run `pnpm --filter @gamevine/web lint` — must be clean.
-   - If the dev server is up, invoke `e2e-smoke` to navigate and verify the page renders.
+   - If the dev server is up, drive the new page via the browser MCP to verify it renders.
 
 5. **Hand off.** This is a skeleton. Real content, styles, and copy are the parent's job. Don't claim "done."
 

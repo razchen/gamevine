@@ -10,11 +10,14 @@ Steps:
 
 1. `code-reviewer` — always.
 2. `react-perf-reviewer` — if the diff touches any `.tsx` / `.jsx` file. Reads `.cursor/skills/vercel-react-best-practices/SKILL.md` first.
-3. `dry-checker` — always.
-4. `schema-sync` — if the diff touches `packages/shared/**` or `apps/api/**/*.schema.ts`.
-5. `security-auditor` — if the diff touches auth, API routes, env handling, or DB queries.
+3. `schema-sync` — if the diff touches `packages/shared/**` or `apps/api/**/*.schema.ts`.
+4. `security-auditor` — if the diff touches auth, API routes, env handling, or DB queries.
 
-Skip by default (unless I specifically ask): `test-runner`, `lint-typecheck-fixer`, `e2e-smoke`, scaffolders, `drizzle-migrations`.
+Optional (only if the diff adds a new utility, component family, or non-trivial helper):
+
+- `dry-checker` — check for duplications in new code.
+
+Skip by default (unless I specifically ask): `test-runner`, `lint-typecheck-fixer`, scaffolders, `drizzle-migrations`.
 
 Final report:
 

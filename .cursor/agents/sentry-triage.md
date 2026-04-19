@@ -85,7 +85,7 @@ FIX PLAN
 1. <file>:<line-range> — <change>
 2. <second file>:<range> — <change>
 3. Test to add: <path>, covering <cases>
-4. Runtime verification: <which subagent the parent should run next — schema-sync, e2e-smoke, etc.>
+4. Runtime verification: <which subagent / manual step the parent should run next — e.g. schema-sync, browser MCP walk-through, curl against the api, etc.>
 
 RISK / IMPACT
 - Deploy urgency: CRITICAL / HIGH / MEDIUM / LOW

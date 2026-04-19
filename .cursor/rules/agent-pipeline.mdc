@@ -1,5 +1,5 @@
 ---
-description: Mandatory sequential agent pipeline for implementation work.
+description: Sequential agent pipeline for implementation work.
 alwaysApply: true
 ---
 
@@ -9,44 +9,47 @@ Run agents **sequentially, not in parallel** to avoid conflicts. The pipeline be
 
 ## The full agent roster
 
-| Agent                  | Purpose                                         | When to use                                                     |
-| ---------------------- | ----------------------------------------------- | --------------------------------------------------------------- |
-| `next16-docs`          | Next.js 16 / React 19 authoritative answers     | Before writing any Next/React code you're not certain about     |
-| `schema-sync`          | Audit cross-app breakage when contracts change  | Any change to `packages/shared/**` or `apps/api/**/*.schema.ts` |
-| `drizzle-migrations`   | Generate, review, and apply Drizzle migrations  | Drizzle schema changes                                          |
-| `e2e-smoke`            | Drive the running web app to prove a flow works | After changes to `apps/web` routes or client flows              |
-| `nest-feature`         | Scaffold a Nest feature module                  | Creating a new api domain                                       |
-| `web-route`            | Scaffold an App Router route                    | Creating a new web route                                        |
-| `turbo-doctor`         | Diagnose turbo cache / pipeline issues          | `turbo` cache misbehaves or is too cold                         |
-| `sentry-triage`        | Turn a Sentry issue into a fix plan             | Production error investigation                                  |
-| `lint-typecheck-fixer` | Bounded lint-fix + typecheck loop               | Before claiming done                                            |
-| `code-reviewer`        | Quality, correctness, readability review        | MANDATORY after implementation                                  |
-| `react-perf-reviewer`  | Vercel 57-rule React/Next perf review           | MANDATORY if any `.tsx`/`.jsx` touched                          |
-| `dry-checker`          | Find duplicates and existing utils              | BEFORE coding and after implementation                          |
-| `test-runner`          | Run tests + enforce spec-per-changed-file       | MANDATORY after implementation                                  |
-| `debugger`             | Root-cause analysis for current-session errors  | Errors, test failures, unexpected behavior                      |
-| `security-auditor`     | Auth / API route / env security review          | MANDATORY if auth, API routes, env, or DB touched               |
+| Agent                  | Purpose                                        | When to use                                                           |
+| ---------------------- | ---------------------------------------------- | --------------------------------------------------------------------- |
+| `next16-docs`          | Next.js 16 / React 19 authoritative answers    | Before writing any Next/React code you're not certain about           |
+| `schema-sync`          | Audit cross-app breakage when contracts change | Any change to `packages/shared/**` or `apps/api/**/*.schema.ts`       |
+| `drizzle-migrations`   | Generate, review, and apply Drizzle migrations | Drizzle schema changes                                                |
+| `nest-feature`         | Scaffold a Nest feature module                 | Creating a new api domain                                             |
+| `web-route`            | Scaffold an App Router route                   | Creating a new web route                                              |
+| `turbo-doctor`         | Diagnose turbo cache / pipeline issues         | `turbo` cache misbehaves or is too cold                               |
+| `sentry-triage`        | Turn a Sentry issue into a fix plan            | Production error investigation                                        |
+| `lint-typecheck-fixer` | Bounded lint-fix + typecheck loop              | Before claiming done                                                  |
+| `code-reviewer`        | Quality, correctness, readability review       | MANDATORY after implementation                                        |
+| `react-perf-reviewer`  | Vercel 57-rule React/Next perf review          | MANDATORY if any `.tsx`/`.jsx` touched                                |
+| `dry-checker`          | Find duplicates and existing utils             | OPTIONAL — when suspected duplication, new utility, or large refactor |
+| `test-runner`          | Run tests + enforce spec-per-changed-file      | MANDATORY after implementation                                        |
+| `debugger`             | Root-cause analysis for current-session errors | Errors, test failures, unexpected behavior                            |
+| `security-auditor`     | Auth / API route / env security review         | MANDATORY if auth, API routes, env, or DB touched                     |
 
 Use Cursor's built-in **Plan Mode** for planning complex features. There is no `planner` subagent; Plan Mode replaces it.
 
 ## Mandatory pipeline order (implementation)
 
 ```
-1.  dry-checker             → BEFORE coding: does this util/component already exist?
-2.  [implement]             → write the change
-3.  code-reviewer           → MANDATORY quality review
-4.  react-perf-reviewer     → MANDATORY if any .tsx/.jsx file was modified
-5.  test-runner             → MANDATORY: run tests + enforce coverage for changed files
-6.  dry-checker             → MANDATORY second pass: did implementation introduce duplication?
-7.  schema-sync             → MANDATORY if packages/shared/** or api/**/*.schema.ts changed
-8.  security-auditor        → MANDATORY if auth, API routes, env handling, or DB queries touched
-9.  lint-typecheck-fixer    → MANDATORY: final green (lint + typecheck across workspace)
-10. e2e-smoke               → MANDATORY if apps/web routes or client data flows changed
+1. [implement]           → write the change
+2. code-reviewer         → MANDATORY quality review
+3. react-perf-reviewer   → MANDATORY if any .tsx/.jsx file was modified
+4. test-runner           → MANDATORY: run tests + enforce coverage for changed files
+5. schema-sync           → MANDATORY if packages/shared/** or api/**/*.schema.ts changed
+6. security-auditor      → MANDATORY if auth, API routes, env handling, or DB queries touched
+7. lint-typecheck-fixer  → MANDATORY: final green (lint + typecheck across workspace)
 ```
+
+## Optional agents
+
+Invoke these when they add value; don't run them by default.
+
+- **`dry-checker`** — before coding in new utility / new component / large-refactor territory, and after implementation if you suspect you may have duplicated something. A quick Grep / Glob is usually sufficient for ordinary changes.
+- **`next16-docs`** — when writing Next.js 16 / React 19 code you're not certain about. For trivial or well-known patterns, reading `apps/web/node_modules/next/dist/docs/` or hitting Context7 directly is faster.
 
 ## Non-negotiable rules
 
-**Step 4 (react-perf-reviewer) is a FILE-TYPE check, not a judgment call.**
+**Step 3 (react-perf-reviewer) is a FILE-TYPE check, not a judgment call.**
 
 - If any modified file ends in `.tsx` or `.jsx`, run it. Period.
 - "Just CSS changes" is not an exemption.
@@ -63,23 +66,21 @@ Use Cursor's built-in **Plan Mode** for planning complex features. There is no `
   3. Ask the user to decide.
 - Do NOT silently skip findings.
 
-**Do not jump straight to editing.**
+**Think before editing.**
 
-- The FIRST tool call on a non-trivial implementation should be `dry-checker` (or Plan Mode for complex features), not `Write` or `StrReplace`.
+- Before writing a new utility, component family, or abstraction, quickly check whether something equivalent already exists (Grep / Glob is usually enough; `dry-checker` for larger surfaces).
+- For complex features with meaningful trade-offs, use Plan Mode before editing.
 
 ## Pre-completion checklist
 
 Before claiming a task is done, verify every applicable item:
 
-- [ ] First meaningful step was `dry-checker` (or Plan Mode), not a file edit.
 - [ ] `code-reviewer` ran after implementation.
 - [ ] If `.tsx`/`.jsx` files were modified, `react-perf-reviewer` ran.
 - [ ] `test-runner` ran and reported PASS (not BLOCKING, not FAIL).
-- [ ] `dry-checker` ran a second time, after implementation.
 - [ ] If `packages/shared/**` or `api/**/*.schema.ts` changed, `schema-sync` ran.
 - [ ] If auth/API routes/env/DB touched, `security-auditor` ran.
 - [ ] `lint-typecheck-fixer` ran and reported clean.
-- [ ] If web routes or client flows changed, `e2e-smoke` ran and passed.
 - [ ] Every agent recommendation was applied (or user was asked to decide).
 
 If any of these don't apply to the change, say so explicitly in your summary ("no `.tsx` files touched, skipping react-perf-reviewer"). Don't omit silently.
@@ -89,12 +90,11 @@ If any of these don't apply to the change, say so explicitly in your summary ("n
 Via the Task tool: `Task(subagent_type="code-reviewer", prompt="Review src/... changes")`.
 Or explicitly: `/code-reviewer review the changes`.
 
-The user has explicitly accepted the tool-call cost of running these agents. Do not second-guess it to "save time."
+The user has explicitly accepted the tool-call cost of running the MANDATORY agents. Do not second-guess it to "save time."
 
 ## Common mistakes to avoid
 
-- Jumping to `StrReplace` without running `dry-checker` first.
 - Thinking "no logic changes" exempts you from any mandatory step. It does not.
-- Finishing without the second `dry-checker` pass.
 - Treating this pipeline as documentation rather than required workflow. It is required.
 - Skipping `schema-sync` because "tsc is green." TSC is the floor. See `.cursor/rules/definition-of-done.mdc`.
+- Running optional agents reflexively on trivial changes. Use judgment — they're optional for a reason.
