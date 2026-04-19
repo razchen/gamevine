@@ -45,7 +45,47 @@
 - Each roadmap item gets a **platform-estimated funding target** based on the AI engine selected by the creator when the item is created.
 - The selected AI engine is **locked** for that roadmap item.
 - The **first fully funded** approved roadmap item gets the next available implementation slot.
-- Requests should stay aligned with **small, patch-sized** outcomes.
+- Requests should stay aligned with **small, patch-sized** outcomes (see `ai-pipeline-engines-and-releases.md` for the patch-size definition).
+
+# Funding Mechanics (launch)
+
+- **Minimum contribution**: `5,000 credits` per contribution. Contributors may contribute multiple times.
+- **Multiple contributors per item**: allowed. The item tracks each contribution for refund purposes.
+- **Over-funding**: not allowed. The last contribution is clamped to exactly reach the target; any excess is not charged.
+- **Creator self-funding**: follows the same rules (minimum, clamping) but does not forfeit creator-review rights.
+- **Pledged credits are held, not spent**, until the item's terminal outcome:
+  - **Released**: credits are spent and flow to platform revenue.
+  - **Canceled by creator / failed-escalated / removed by moderation / creator-inactivity refund**: credits are returned to each contributor's wallet as **refund credits** (same credit type; no cash refund).
+- **Creators cannot unilaterally cancel a fully funded item** unless they also agree to the automatic contributor refund; the UI enforces this with a confirmation step.
+
+# Creator Review SLA (launch)
+
+- A creator has **14 days** from the moment an idea enters their review queue to approve or reject it.
+- **3 days before expiry**, the creator receives a reminder notification (see `notifications.md`).
+- On SLA expiry with no decision, the idea **auto-closes** and the submitter's submission fee is **refunded** (SLA expiry is treated as the platform's failure, not the submitter's).
+- Creators that repeatedly breach SLA on live games trigger the inactivity path below.
+
+# Duplicate Handling (launch)
+
+- AI normalization runs a similarity check against existing ideas on the same game.
+- On a high-similarity match, the new idea is **soft-merged**: the submitter is shown the existing idea and can confirm or cancel.
+  - Confirm: submission fee is not charged; the existing idea's interest counter increments.
+  - Cancel: no charge.
+- On a borderline match, both ideas continue as separate items; creator review can explicitly mark one as a duplicate of the other, refunding the later submitter.
+
+# Creator Inactivity (launch)
+
+- A live game enters the `dormant` state (see `game-storage-and-lifecycle.md`) when all of these are true for **30 consecutive days**:
+  - No creator action on the review queue.
+  - No creator-initiated roadmap item, publish, or rollback.
+  - No response to any platform notification marked `[requires-response]`.
+- A `dormant` game:
+  - Displays a visible "dormant" label on its public detail page.
+  - Continues to play normally.
+  - Stops accepting new raw idea submissions.
+  - Holds any fully funded but unimplemented items.
+- After an **additional 30 days of continued inactivity** (60 days total), all fully funded but unimplemented items on the game are **canceled** and contributors are refunded.
+- Any qualifying creator action (review, publish, rollback, reply) ends dormancy immediately and reactivates intake.
 
 # Frontend Notes
 
@@ -69,11 +109,14 @@
 - Creator-added roadmap items competing with community-funded items.
 - Multiple approved roadmap items reaching full funding close together.
 
+# Resolved Questions
+
+- **Duplicate merging timing**: before creator review (soft-merge at AI normalization), with a creator-level "mark duplicate of" action available afterward.
+- **Public visibility of funding/queue**: funding progress and queue position are public on the per-game roadmap page. Contributor handles are public; contributed amounts per contributor are private (only the contributor and the creator see per-contributor amounts).
+
 # Open Questions
 
-- How much creator-facing detail should AI provide when it normalizes a raw idea?
-- Should duplicate ideas be merged before creator review or after approval?
-- How much public visibility should funded progress and queue ordering have at launch?
+- How much creator-facing detail should AI provide when it normalizes a raw idea? — deferred; launch shows the normalized item title, description, and scope category, with the original raw text available on request.
 
 # Suggested Epics
 

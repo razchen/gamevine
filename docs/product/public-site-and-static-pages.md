@@ -50,6 +50,63 @@
 - **FAQ** should answer the most confusing launch questions around game scope, credits, subscriptions, roadmap items, and AI updates.
 - **Contact / Support**, **Terms**, and **Privacy** should exist on day one as the minimum trust/support/legal set.
 
+# Per-Page Required Sections (launch)
+
+## Home (`/`)
+
+- Hero: product one-liner, primary CTA ("Start playing" → `/browse`), secondary CTA ("Start creating" → `/pricing#creator`).
+- "How it works" summary (3 steps: play → fund → AI ships updates) with a link to `/how-it-works`.
+- Featured / new games carousel (drawn from the same backend feed as `/browse`).
+- Creator callout ("Turn a template into a live, evolving game") with link to pricing.
+- Footer: legal, contact, social, version tag.
+
+## How It Works (`/how-it-works`)
+
+- The core loop in five sections: **templates**, **creator approval**, **raw ideas**, **funding**, **AI updates**.
+- One short explainer per section (≤ 150 words), each with one illustrative diagram/screenshot placeholder.
+- Template gallery preview with names of the 10 launch templates and a link to sign up to create from one.
+- FAQ link.
+
+## Pricing (`/pricing`)
+
+- Tier ladder (Free / Supporter / Creator / Creator Pro) as cards, matching `subscriptions-pricing-and-credit-value.md`.
+- Credit-action examples table (same doc).
+- Top-up packages table.
+- "What credits are used for" plain-language block.
+- FAQ block focused on pricing/billing.
+- Primary CTA on each paid tier ("Subscribe").
+
+## FAQ (`/faq`)
+
+- Grouped by: About Gamevine, Playing, Creating, Credits & Subscriptions, Updates & AI, Safety & Trust.
+- Each group opens with the 3–5 highest-intent questions at launch.
+
+## Contact / Support (`/support`)
+
+- Support email (`support@gamevine.ai`), DMCA contact alias (`dmca@gamevine.ai`), expected response SLA (launch: 3 business days).
+- Link to status page (stub at launch).
+- A minimal contact form posting to the support inbox.
+
+## Terms (`/terms`) and Privacy (`/privacy`)
+
+- Standard boilerplate plus Gamevine-specific clauses about credit ownership (credits are licenses, not property), AI-generated content (creator ownership of output), refund/dispute stance (see `credits-and-monetization.md`), and data handling (see data export / deletion in `account-and-settings.md`).
+
+# SEO Floor (launch)
+
+- Every page ships with a non-default `<title>` and `<meta name="description">`.
+- Open Graph tags on every public page: `og:title`, `og:description`, `og:image`, `og:url`, `og:type`.
+- Twitter card tags (`summary_large_image`).
+- `/sitemap.xml` auto-generated from public routes (home, how-it-works, pricing, faq, support, terms, privacy, and every published game detail page).
+- `/robots.txt` allowing all public routes, disallowing `/admin`, `/api`, `/my-games`, `/wallet`, `/inbox`, `/settings`.
+- Canonical URLs on every page.
+- JSON-LD on `/game/<slug>`: `VideoGame` schema with name, description, creator handle, and cover image.
+
+# Browse Gating
+
+- `/browse` and `/game/<slug>` are **public** (visitors can view without signing in).
+- `/play/<slug>` is **public** (playing a game does not require an account).
+- Any action that produces state (submit idea, fund, follow, report) requires sign-in.
+
 # Frontend Notes
 
 - The public site should have a clear navigation model for home, explanatory pages, pricing, FAQ, and support/trust pages.
@@ -71,11 +128,11 @@
 - Public pages overpromising capabilities that the launch product does not support.
 - Visitors landing on Pricing before understanding the product and misunderstanding what subscriptions unlock.
 
-# Open Questions
+# Resolved Questions
 
-- What exact sections should appear on the launch Home page?
-- Should **browse games** be linked directly from the public site, or should the public site primarily drive sign-up first?
-- Should Contact and Support be one page at launch or separate surfaces later?
+- **Home sections**: listed above under "Per-Page Required Sections (launch) → Home".
+- **Browse gating**: browse and play are public; the public site links to `/browse` directly from Home.
+- **Contact vs Support**: one page (`/support`) at launch, combining contact form, DMCA alias, and status link.
 
 # Suggested Epics
 

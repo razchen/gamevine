@@ -20,6 +20,11 @@ Read **`product-overview.md`** first for the north-star summary and cross-cuttin
 | [public-site-and-static-pages.md](./public-site-and-static-pages.md)                     | Public marketing, explainer, FAQ, and support pages        |
 | [app-surfaces-and-navigation.md](./app-surfaces-and-navigation.md)                       | Signed-in app destinations and product surface layout      |
 | [account-and-settings.md](./account-and-settings.md)                                     | Profile, preferences, billing-adjacent, and settings scope |
+| [authentication-and-identity.md](./authentication-and-identity.md)                       | Signup, signin, verification, sessions, account lifecycle  |
+| [moderation-and-trust-safety.md](./moderation-and-trust-safety.md)                       | Content policy, AI screening, reports, admin actions, DMCA |
+| [notifications.md](./notifications.md)                                                   | Event catalog, channels, in-app inbox, preferences         |
+| [game-storage-and-lifecycle.md](./game-storage-and-lifecycle.md)                         | Game entity, source branch, releases, lifecycle states     |
+| [player-runtime-and-sandbox.md](./player-runtime-and-sandbox.md)                         | Origin split, iframe sandbox, CSP, runtime API, limits     |
 
 ## Conventions
 

@@ -12,6 +12,7 @@ Any file under `apps/api/**` pulls in these rules at the repo root `.cursor/rule
 - `drizzle.mdc` — schema location, migration workflow (`db:generate` → review → `db:migrate`), forbidden `db:push` outside local.
 - `zod-dto.mdc` — Zod schemas over class-validator, `ZodValidationPipe`, cross-app schemas live in `@gamevine/shared`.
 - `env.mdc` — all env through `AppConfigService`, single `envSchema` in `config/env.validation.ts`.
+- `casl.mdc` — authorization with CASL: `CaslAbilityFactory`, `PoliciesGuard`, `@CheckPolicies`, condition-based rules against the authenticated user.
 
 Plus all always-applied rules: `monorepo`, `definition-of-done`, `docs-first`, `commits`, `agent-pipeline`, `code-review-pipeline`, and `testing.mdc` for `*.spec.ts`.
 
@@ -79,6 +80,20 @@ Required env vars (see `apps/api/src/config/env.validation.ts`):
 | `POC_TEMPLATES_ROOT`      | `.gamevine/poc-templates`      | Server-owned template root. Requests use template IDs beneath this directory.                                                   |
 
 Local setup: copy `.env.example` to `.env` and fill it in. The bootstrap throws a readable error listing every failing field if something is missing.
+
+## Authorization (CASL)
+
+- Shared ability definitions live in `@gamevine/shared` (`defineAbilitiesFor(user)`) — import and reuse, don't hand-write role checks.
+- Wire `CaslModule` with `CaslAbilityFactory` (wraps `defineAbilitiesFor`), a `PoliciesGuard`, and a `@CheckPolicies` decorator. Scope:
+
+  ```ts
+  @Post(':id/approve')
+  @CheckPolicies((ability) => ability.can('approve', 'Idea'))
+  approve(@Param('id') id: string) { /* ... */ }
+  ```
+
+- For ownership-scoped rules, fetch the resource first and check `ability.can('update', subject('Game', game))` in the service. Prefer this over reading `user.role` directly.
+- See `.cursor/rules/casl.mdc` for the full pattern and `docs/product/users-roles-and-permissions.md` for the role × action matrix that abilities implement.
 
 ## When implementing a new feature
 

@@ -73,6 +73,24 @@
 - Purchased top-up credits should remain in the wallet, but spending them still requires an **active subscription**.
 - No annual plans should exist at launch; keep the launch commercial model monthly and simple.
 
+# Billing Cycle & Proration (launch)
+
+- **Billing cycle** is anchored to the **subscription start date** (billing anniversary), not the calendar month.
+- **Monthly credit reset**: on each renewal, the prior period's unused subscription credits are zeroed via a ledger entry (see `credits-and-monetization.md`) and the new grant is applied.
+- **Upgrade mid-cycle** (e.g., Supporter → Creator):
+  - Proration is handled by the payment processor for the cash portion.
+  - Included-credit delta is applied immediately: new tier's monthly credit allocation replaces the remaining portion of the old tier's allocation, prorated by remaining days.
+- **Downgrade mid-cycle**: takes effect at the next renewal. Current cycle's credits stay granted.
+- **Cancellation mid-cycle**: subscription remains active until the end of the paid period; credits remain usable until then.
+- **Failed payment**: one automatic retry at `+72h`, one at `+7d`. After the second failure, the subscription enters **past-due** state: sign-in and play still work, credit-consuming actions are blocked until payment succeeds. After **14 days past-due**, the subscription cancels; any top-up credits remain in the wallet but become un-spendable until a new subscription starts.
+- **Top-up credits after cancellation**: remain in the wallet indefinitely but **cannot be spent** without an active subscription. After **12 months with no active subscription**, top-up credits **expire** (a single `adjust.expired` ledger entry zeros them).
+
+# Commercial Stack (launch)
+
+- Payment processor at launch: **Stripe** (Stripe Billing for subscriptions, Stripe Checkout for top-ups, Stripe Tax deferred).
+- Webhook events update subscription state and wallet grants server-side.
+- Invoices and receipts are delivered via Stripe's hosted receipts; a link is included in the in-app receipt notification (see `notifications.md`).
+
 # Frontend Notes
 
 - Product surfaces should explain the difference between subscription benefits and credit spend.

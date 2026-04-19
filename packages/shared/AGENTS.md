@@ -17,6 +17,7 @@ This package runs in both **Node (NestJS)** and **the browser (Next.js via `tran
 - **Zod schemas** that cross the api/web boundary (request/response shapes, shared primitive schemas like `UuidSchema`).
 - **Types inferred** from those schemas (`export type Foo = z.infer<typeof Foo>`).
 - **App-level constants** (`APP_NAME`, `API_HEALTH_PATH`).
+- **CASL ability definitions** — subject/action string unions, `AppAbility` type, and the `defineAbilitiesFor(user)` factory. Both apps consume the same ability rules. See `.cursor/rules/casl.mdc`.
 - **Pure helpers** with no environmental dependencies.
 
 ## What does NOT live here
@@ -38,7 +39,7 @@ packages/shared/src/
 
 ## Dependencies
 
-The only runtime dependency allowed without explicit agreement is **`zod`**. Everything else: dev-dep or don't add it.
+Runtime dependencies allowed without further agreement: **`zod`** and **`@casl/ability`**. Both are isomorphic, pure, and their whole value comes from being shared across both apps. Anything else: dev-dep or don't add it.
 
 ## Making changes
 

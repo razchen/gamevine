@@ -55,6 +55,46 @@
 - Build workers should **not** hold production publishing secrets.
 - Publishing should happen through a **separate service** with scoped release credentials.
 
+# Engine Catalog (launch)
+
+Three tiers at launch. The **creator** picks one per roadmap item at creation and it is locked.
+
+| Tier         | Internal name     | Credit cost multiplier | Typical use                                                                          | Recommended default                        |
+| ------------ | ----------------- | ---------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------ |
+| **Fast**     | `engine.fast`     | 0.6x                   | Small bug fixes, tuning, copy/visual tweaks. Lowest latency, least creative freedom. | Bug fixes.                                 |
+| **Balanced** | `engine.balanced` | 1.0x                   | Most feature work (new enemies, weapons, small map sections, balance passes).        | Default for new roadmap items.             |
+| **Premium**  | `engine.premium`  | 1.8x                   | Visually or mechanically ambitious work; best quality, highest cost.                 | Boss fights, distinctive visual additions. |
+
+Additional engines used internally, not selectable by creators:
+
+- **`engine.screening`** — cheap, fast model used for AI screening of raw idea submissions and game titles/descriptions (see `moderation-and-trust-safety.md`).
+- **`engine.estimator`** — same class as screening; used to produce the pre-run cost range quote.
+
+Engine identities at launch map to specific upstream models (a Claude-family and GPT-family pair each is fine; implementation decides). The mapping is **config-driven** so it can be updated without a product-doc change, but the **tier names, multipliers, and rules above are stable at launch**.
+
+# Patch Size Definition (launch)
+
+"Patch-sized" is the acceptance bar for both the pre-run estimate and the test gate. A run that exceeds any of these limits fails the gate and the item is escalated rather than released:
+
+- **Files changed**: ≤ 15.
+- **Net lines changed**: ≤ 1,500 (added + removed).
+- **New binary asset delta**: ≤ 5 MB.
+- **Build time**: ≤ 5 minutes.
+- **Resulting bundle delta**: must keep the game under the published bundle limits (see `player-runtime-and-sandbox.md`).
+- **Files outside the template's allowed customization surfaces**: 0.
+
+# Test Gate (launch)
+
+A release is eligible for automatic publish only if **all** of the following pass inside the sandbox:
+
+1. **Build succeeds** with no errors.
+2. **Template-owned smoke tests** pass (every launch template ships with a minimal smoke suite: game boots, main menu renders, first input advances state).
+3. **Bundle validation** passes (limits + CSP + MIME — see `player-runtime-and-sandbox.md`).
+4. **Patch-size validation** passes (limits above).
+5. **No new external network references** introduced.
+
+Any failure triggers the single retry. A second failure escalates to super admin; the roadmap item enters `failed-escalated` and contributor credits are refunded per `credits-and-monetization.md`.
+
 # Frontend Notes
 
 - Product surfaces should show the selected engine for a roadmap item, pipeline status, and release outcomes at a high level.
@@ -86,12 +126,16 @@
 - Sandbox escape or job isolation failure on the worker infrastructure.
 - Successful build artifacts that should not be published because artifact handoff or release promotion fails.
 
+# Resolved Questions
+
+- **Minimum launch test bar**: defined above under "Test Gate (launch)".
+- **Failed-run surfacing**: creators see pipeline status on their game management surface with states `queued | running | succeeded | retrying | failed-escalated`; super admins see the full run with logs in the admin queue (see `moderation-and-trust-safety.md` and `notifications.md`).
+- **Rollback**: resolved in `game-storage-and-lifecycle.md` — creators can rollback to any prior release from release history; super admins can force-rollback.
+- **Over-estimate handling**: if an in-flight run's actual token usage exceeds the quoted 90% margin, the platform **absorbs** the overage at launch (no post-hoc re-billing). The analytics system flags the item so the estimator can be tuned. Repeated over-estimates on the same engine tier trigger an estimator-policy review.
+
 # Open Questions
 
-- What minimum launch test bar is required before a release is considered safe enough to publish automatically?
-- How should the product surface failed or escalated pipeline runs to creators versus super admins?
-- What rollback behavior should exist if a released update is later found to be bad?
-- How should the platform communicate and handle the rare runs that exceed the quoted **90%-margin** estimate?
+- Deferred: opening lower-cost or higher-cost engine tiers beyond Fast/Balanced/Premium. Revisit after launch based on funnel data.
 
 # Suggested Epics
 

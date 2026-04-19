@@ -34,6 +34,32 @@
 - A separate publisher/release service should be responsible for promoting successful artifacts to Cloudflare-managed storage and delivery infrastructure.
 - Release promotion should happen only after build/test gates succeed upstream.
 
+# URL Scheme (launch)
+
+- **Player (public)**: `https://<gameSlug>.gamevineusercontent.com/` — serves the current release's bundle. Isolated origin per `player-runtime-and-sandbox.md`.
+- **App-embedded game page**: `https://gamevine.ai/play/<gameSlug>` — the app page that embeds the game iframe and renders surrounding UI (roadmap, funding, etc.).
+- **Game detail (non-play)**: `https://gamevine.ai/game/<gameSlug>` — public game detail page (description, roadmap, contributors). Public, no signin required.
+- **Slugs**: globally unique, `[a-z0-9-]`, 3–40 chars, immutable after first publish.
+
+# Release Addressing
+
+- The public player URL always serves the **current release**. There is **no** version-pinned public URL at launch (deferred).
+- Internally, each release has a stable R2 path: `games/<gameId>/releases/<releaseId>/`.
+- A per-game **manifest file** (`games/<gameId>/current.json`) is the source of truth for "what release is current". The player subdomain resolves through this manifest via a KV-backed fast path.
+
+# Cache & Invalidation
+
+- Per-release bundle files are uploaded with **immutable, content-hashed filenames** and `Cache-Control: public, max-age=31536000, immutable`.
+- The `index.html` and `current.json` manifest are served with `Cache-Control: public, max-age=60, must-revalidate` so a publish or rollback propagates in about a minute.
+- On publish or rollback, the publisher explicitly purges the manifest and `index.html` CDN cache for that game; asset files are not purged because they are content-hashed.
+- Telemetry endpoint (`telemetry.gamevine.ai`) is never cached.
+
+# Rollback Behavior (launch)
+
+- Creator-initiated rollback on a published game flips `current.json` to a prior release. Previous release's state becomes `superseded` (see `game-storage-and-lifecycle.md`).
+- Super-admin force-rollback is available from admin surfaces and writes an audit log entry marking the prior release as `rolled_back`.
+- Rollback propagation SLA: the rolled-back bundle is served to new requests within **60 seconds** of the action. In-flight players keep their current session.
+
 # Frontend Notes
 
 - Player-facing delivery should hide the internal split between build workers and the publisher service.
@@ -58,10 +84,14 @@
 - Large asset sets that slow publishing or invalidation behavior.
 - Security risk if build and publish responsibilities are not separated clearly enough.
 
+# Resolved Questions
+
+- **Version pinning**: no public version-pinning URL at launch. Players always see the current release.
+- **Rollback**: defined above under "Rollback Behavior (launch)"; also covered in `game-storage-and-lifecycle.md`.
+
 # Open Questions
 
-- Should players always receive the latest release on the main game page, or should some version pinning exist?
-- What rollback behavior should exist if a published static bundle is later found to be bad?
+- Deferred: player-facing version history URL (play a specific prior release).
 
 # Suggested Epics
 

@@ -49,10 +49,42 @@
 - Navigation should clearly separate **public/browse/play** flows from **creator management** flows.
 - Creator-only surfaces should only expose actions that match the single-owner launch model.
 - The information architecture should reflect the main product loop: **play → submit idea → fund roadmap item → release update**.
-- Creator management should live in the **same primary navigation** as other product surfaces at launch.
+
+# Launch Top-Level Destinations (signed in)
+
+The signed-in app chrome exposes these top-level destinations. Anything else is a sub-page.
+
+- **`/browse`** — discovery feed: trending, new, top-funded, by genre. Default landing for signed-in users.
+- **`/game/<slug>`** — public game detail page (read-only: description, roadmap, contributors).
+- **`/play/<slug>`** — the embedded play page with the iframe and supporting UI (submit idea, fund, see progress).
+- **`/create`** — Creator-tier gated. The template-picker and new-game wizard.
+- **`/my-games`** — Creator-only. The list of games the user owns, each linking to its management surface.
+- **`/my-games/<slug>/manage`** — Creator management for a single game: idea review queue, roadmap items, release history, publish/rollback controls.
+- **`/wallet`** — Balance, recent transactions, pending pledges, top-up purchase, subscription status and plan management.
+- **`/inbox`** — In-app notification inbox (see `notifications.md`).
+- **`/settings`** — Account, profile, notification prefs (see `account-and-settings.md`).
+- **`/admin`** — Super-admin only. Moderation queue, pipeline-run inspector, user/game tools, wallet adjustment.
+
+Header nav (visible to everyone signed in): `Browse`, `Create` (disabled tooltip for non-Creators), wallet balance badge (links to `/wallet`), inbox bell (links to `/inbox`), avatar menu (links to `/my-games`, `/settings`, sign out).
+
+# Surface-to-Role Visibility
+
+| Surface                                           | Visitor | Free                       | Supporter | Creator | Super Admin |
+| ------------------------------------------------- | ------- | -------------------------- | --------- | ------- | ----------- |
+| `/browse`, `/game/<slug>`, `/play/<slug>`         | ✓       | ✓                          | ✓         | ✓       | ✓           |
+| `/create`, `/my-games`, `/my-games/<slug>/manage` | —       | —                          | —         | ✓ (own) | ✓           |
+| `/wallet`                                         | —       | ✓ (view only, no purchase) | ✓         | ✓       | ✓           |
+| `/inbox`, `/settings`                             | —       | ✓                          | ✓         | ✓       | ✓           |
+| `/admin`                                          | —       | —                          | —         | —       | ✓           |
+
+Paid-participation actions on pages otherwise visible (e.g., `[Submit idea]` on `/play/<slug>`) follow the role matrix in `users-roles-and-permissions.md` — the page renders; the button is disabled with an upgrade prompt for roles that can't act.
+
+# Additional Product Rules
+
+- Creator management lives in the **same primary navigation** as other product surfaces at launch.
 - The app should make it easy to move from **playing a game** to **viewing its roadmap** to **funding or submitting an idea**.
-- **My Games** should be the main launch entry point for creator-specific management actions.
-- Wallet and notification surfaces should be available globally, not buried inside creator-only areas.
+- `/my-games` is the main launch entry point for creator-specific management actions.
+- Wallet and notification surfaces are available globally, not buried inside creator-only areas.
 
 # Frontend Notes
 
@@ -76,11 +108,15 @@
 - Navigation becoming cluttered as both player and creator capabilities exist in one product.
 - Users who are only players seeing creator-oriented destinations they do not need.
 
+# Resolved Questions
+
+- **Signed-in landing**: `/browse` (discovery-first). No separate "Home" dashboard at launch.
+- **Roadmap placement**: inline on `/game/<slug>` and `/play/<slug>` (one tab/section, not a separate route). Creators manage it on `/my-games/<slug>/manage`.
+- **Inbox retention**: last 90 days (see `notifications.md`).
+
 # Open Questions
 
-- What should the signed-in **Home** surface emphasize at launch: game discovery, personal activity, or creator activity?
-- Should the roadmap for a game live directly on the game detail page or as a clearly separate sub-surface?
-- How much activity history should appear in **Notifications** at launch?
+- Deferred: signed-in dashboard / "Home" surface with personalized activity beyond `/browse`.
 
 # Suggested Epics
 

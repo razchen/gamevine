@@ -4,13 +4,13 @@ Browser-based games and community-driven updates. Monorepo managed with pnpm wor
 
 ## Workspaces
 
-| Path                     | Package                   | Stack                                                                 |
-| ------------------------ | ------------------------- | --------------------------------------------------------------------- |
-| `apps/web`               | `@gamevine/web`           | Next.js 16 (App Router), React 19, Tailwind v4, TanStack Query, axios |
-| `apps/api`               | `@gamevine/api`           | NestJS 11, Drizzle ORM, PostgreSQL, Zod                               |
-| `packages/shared`        | `@gamevine/shared`        | Cross-app types and constants (runtime-free)                          |
-| `packages/eslint-config` | `@gamevine/eslint-config` | Shared ESLint config                                                  |
-| `packages/tsconfig`      | `@gamevine/tsconfig`      | Shared TypeScript configs                                             |
+| Path                     | Package                   | Stack                                                                                |
+| ------------------------ | ------------------------- | ------------------------------------------------------------------------------------ |
+| `apps/web`               | `@gamevine/web`           | Next.js 16 (App Router), React 19, Tailwind v4, TanStack Query, axios, `@casl/react` |
+| `apps/api`               | `@gamevine/api`           | NestJS 11, Drizzle ORM, PostgreSQL, Zod, `@casl/ability`                             |
+| `packages/shared`        | `@gamevine/shared`        | Cross-app types, Zod schemas, CASL ability definitions                               |
+| `packages/eslint-config` | `@gamevine/eslint-config` | Shared ESLint config                                                                 |
+| `packages/tsconfig`      | `@gamevine/tsconfig`      | Shared TypeScript configs                                                            |
 
 ## Golden commands (run from repo root)
 
@@ -41,6 +41,7 @@ There is also one skill at `.cursor/skills/vercel-react-best-practices/` (Vercel
 - **Node `>=20.19`, pnpm `>=10`** (see `package.json` engines). Mismatched versions produce confusing errors.
 - **Next.js 16 is new.** Your training data is probably wrong about it. Read `apps/web/node_modules/next/dist/docs/` and call the Context7 MCP before writing Next code.
 - **Schema changes are a big deal.** Any change to `packages/shared/**` or `apps/api/**/*.schema.ts` must be cross-audited in both apps (see the `schema-sync` subagent).
+- **Authorization goes through CASL.** One ability definition in `@gamevine/shared` drives both the NestJS guard and the React `<Can>` component. Never inline role checks (`user.role === 'creator'`) in feature code; call `ability.can(...)` or use `@CheckPolicies` / `<Can>`. See `.cursor/rules/casl.mdc` and `docs/product/users-roles-and-permissions.md`.
 - **Done means green.** `pnpm typecheck && pnpm lint && pnpm test` all pass before you claim a task is complete. See `.cursor/rules/definition-of-done.mdc`.
 
 ## For humans

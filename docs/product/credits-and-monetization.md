@@ -44,6 +44,35 @@
 - Creator-funded roadmap items and community-backed roadmap items should be **visibly distinguished** in the product.
 - Users should not be allowed to start a credit-consuming action unless they have enough credits for it.
 - Launch uses a **single credit type** only; there are no promotional or free-credit variants at launch.
+- **No signup grant**: new accounts receive 0 credits. Credits exist only via an active subscription or a purchased top-up.
+
+# Wallet Ledger & Transaction Model (launch)
+
+- The wallet is an **append-only ledger**. Balance is derived from the ledger; it is not a mutable counter.
+- Every ledger entry has: `user_id`, `amount` (positive credit / negative debit), `type`, `reason`, `ref_type` / `ref_id` (links to the originating entity), `created_at`.
+- Ledger entry types at launch:
+  - `grant.subscription_monthly` — monthly credits from an active subscription.
+  - `grant.topup_purchase` — purchased top-up credits.
+  - `hold.funding_pledge` — credits reserved when a user pledges to a roadmap item.
+  - `release.funding_pledge_settled` — hold is spent when the item ships.
+  - `release.funding_pledge_refunded` — hold is returned as refund credits when the item is canceled/abandoned/fails.
+  - `spend.idea_submission` — submission fee.
+  - `spend.game_creation` — game creation cost.
+  - `adjust.admin` — super-admin manual adjustment (requires reason).
+  - `adjust.chargeback` — wallet adjustment following a payment chargeback.
+- **Pledged credits** are represented as a `hold.funding_pledge` debit that is pending; the wallet balance shown to users already deducts holds (i.e., pledged credits cannot be spent on something else).
+- **Monthly subscription credits** apply as a single `grant.subscription_monthly` entry on each renewal.
+- **Insufficient balance** is checked before any credit-consuming action starts; the UI blocks the action and offers either a top-up purchase or a plan upgrade path.
+
+# Refunds, Chargebacks, and Disputes (launch)
+
+- **Automatic credit refund (held pledges)**: whenever a roadmap item is canceled (creator-initiated), fails pipeline after escalation, is removed for policy, or is abandoned under the creator-inactivity rule, every contributor receives a `release.funding_pledge_refunded` entry equal to their original pledge. Refunds are credit-only; no cash refund is issued because no cash was spent on the item yet.
+- **Submission fee refunds**: issued only when the platform is at fault — moderation `hold → reject`, creator SLA expiry, confirmed duplicate at creator review.
+- **Cash refunds**: not available at launch for credit purchases, top-ups, or subscriptions beyond the standard payment-processor dispute process.
+- **Chargebacks** (payment processor dispute after credits have been granted or partially spent):
+  - On chargeback, the platform debits the corresponding grant with an `adjust.chargeback` entry.
+  - If this produces a negative balance, the account enters **negative-balance hold**: sign-in works, play works, no credit-consuming actions until balance is restored.
+  - Repeated chargebacks are a moderation signal (see `moderation-and-trust-safety.md`).
 
 # Frontend Notes
 

@@ -68,7 +68,12 @@
 # Technical Notes
 
 - Directional stack: **Next.js** frontend, **NestJS** backend, **PostgreSQL** with **Drizzle**, **Cloudflare R2** (or equivalent object storage), **CDN** delivery, and **private AI/build workers**.
+- Authorization uses **CASL** (`@casl/ability`) with a single ability definition in `@gamevine/shared` consumed by both apps (see `users-roles-and-permissions.md`).
 - AI should work against **targeted file context** and produce **patch-oriented changes** instead of regenerating full games.
+
+# Creator Inactivity Policy (launch)
+
+A live game becomes `dormant` after **30 days** of no qualifying creator action (review, publish, rollback, or response to `[requires-response]` notifications). Dormant games keep playing but stop accepting new idea submissions and carry a visible "dormant" label. After an **additional 30 days** of continued inactivity (60 days total), any fully funded but unimplemented items are canceled and contributors are refunded. See `funding-roadmap-and-creator-control.md` for full rules and `game-storage-and-lifecycle.md` for the state machine.
 
 # Edge Cases
 
@@ -76,14 +81,17 @@
 - Raw ideas that are abusive, malicious, or impossible within platform rules.
 - Requests that look small during intake but would actually require a large rewrite.
 - Multiple approved items competing for funding and roadmap position at the same time.
-- Creator inactivity after players have funded meaningful demand.
+- Creator inactivity after players have funded meaningful demand (handled by the policy above).
+
+# Resolved Questions
+
+- **Creator inactivity**: resolved by the policy above.
+- **Rejected-idea visibility**: rejected ideas remain visible on the per-game public roadmap with a "rejected" label; creator reasoning is optional and hidden by default.
+- **Moderation for borderline ideas**: AI screening has three outcomes — pass, reject, hold. Borderline goes to a super-admin queue (see `moderation-and-trust-safety.md`).
 
 # Open Questions
 
-- How should the platform handle creator inactivity or abandonment of live games?
-- How detailed should the AI-generated structured roadmap item be before creator review?
-- How should moderation work for ideas that are borderline low-quality rather than clearly malicious?
-- How visible should rejected ideas and creator reasoning be to the community?
+- Deferred: how detailed the AI-normalized roadmap item should be for creator review (launch shows title, description, scope category, and the original raw text on request).
 
 # Suggested Epics
 

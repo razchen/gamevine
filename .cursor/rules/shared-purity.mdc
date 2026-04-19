@@ -21,11 +21,12 @@ This package is the **contract** between the web and api apps. It is consumed by
 - Touch the DOM (`window`, `document`, `localStorage`, `navigator`).
 - Touch Node-only APIs (`fs`, `path`, `crypto.createHash` — use `crypto.subtle` via a util if you need hashing, or put the util in an app).
 - Import from `@gamevine/web`, `@gamevine/api`, or their dependencies (Next, Nest, Drizzle, pg, axios, TanStack Query). Shared sits **below** both apps in the dependency graph.
-- Depend on heavy third-party libraries. `zod` is the one sanctioned exception — it's runtime, but the tradeoff (one schema source for both apps) is worth it. Get explicit agreement before adding another.
+- Depend on heavy third-party libraries. Two sanctioned runtime exceptions: **`zod`** (one schema source for both apps) and **`@casl/ability`** (one authorization rule set for both apps). Both are isomorphic and pure. Get explicit agreement before adding a third.
 
 ## Contents that belong here
 
 - Zod schemas and the types inferred from them (`CreateGameRequest`, `GameResponse`, ...).
+- CASL ability definitions: subject/action unions, the `AppAbility` type, and the `defineAbilitiesFor(user)` factory. See `.cursor/rules/casl.mdc`.
 - Pure helpers like path constants (`API_HEALTH_PATH`), app-level constants (`APP_NAME`), URL builders.
 - Enum-like `as const` tuples and their union types.
 - Pure transformation helpers that have no environmental dependencies.

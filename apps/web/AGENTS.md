@@ -20,6 +20,7 @@ Any file under `apps/web/**` pulls in these rules at the repo root `.cursor/rule
 - `react-19.mdc` — refs as props, `use()`, Actions, `useActionState`, memoization hygiene under the compiler.
 - `tailwind-v4.mdc` — CSS-first config, `@theme`, oklch tokens, shadcn + `cva`.
 - `data-fetching.mdc` — shared axios instance, TanStack Query keys, when not to use React Query.
+- `casl.mdc` — authorization with `@casl/react`: `AbilityContext`, `<Can>`, `useAbility()`, UI gating is a hint not a gate.
 
 Plus all always-applied rules: `monorepo`, `definition-of-done`, `docs-first`, `commits`, `agent-pipeline`, `code-review-pipeline`.
 
@@ -55,6 +56,14 @@ pnpm --filter @gamevine/web test
 Web env vars are loaded by Next.js from `.env.local`, `.env.development`, etc. The web app talks to the api via `NEXT_PUBLIC_API_URL` (defaults to `http://localhost:3001` — see `apps/web/src/lib/api.ts`). Only `NEXT_PUBLIC_*` vars are exposed to the browser.
 
 Remember `next.config.ts` declares `transpilePackages: ['@gamevine/shared']`, so `@gamevine/shared` code lands in the browser bundle when imported from a client component — keep `packages/shared` pure (see `shared-purity.mdc`).
+
+## Authorization (CASL)
+
+- The authenticated user's CASL rules arrive from the API as JSON (`ability.rules`) on sign-in and session refresh.
+- Rehydrate into an `Ability` via `createMongoAbility(rules)` from `@casl/ability`, and expose it through a single `AbilityContext` at the root of the authenticated tree (typically in `app/(authenticated)/layout.tsx`).
+- Gate UI with `<Can I="approve" a="Idea">...</Can>` or `const ability = useAbility(AbilityContext); ability.can(...)`. Don't read `user.role` in components.
+- `<Can>` is a **UX hint**, not a security boundary. The API re-checks every write via its `PoliciesGuard`. If your UI is gating something the API doesn't also gate, the API is wrong.
+- See `.cursor/rules/casl.mdc` for the canonical setup and `docs/product/users-roles-and-permissions.md` for the matrix these rules implement.
 
 ## When implementing a new route
 

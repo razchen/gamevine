@@ -1,0 +1,239 @@
+---
+description: CASL authorization. One ability definition in @gamevine/shared, consumed by NestJS guards and React <Can>.
+globs: apps/api/**,apps/web/**,packages/shared/**
+alwaysApply: false
+---
+
+# CASL Authorization
+
+This repo uses **CASL** (`@casl/ability` v6+) for every authorization decision. The role × action matrix in `docs/product/users-roles-and-permissions.md` is the spec; CASL is the implementation.
+
+## One source of truth
+
+All ability rules live in `@gamevine/shared`. Both apps import the **same** `defineAbilitiesFor(user)` factory. This is non-negotiable — if you're tempted to write role logic in `apps/web` or `apps/api`, stop and move it to `packages/shared`.
+
+```ts
+// packages/shared/src/abilities/abilities.ts
+import { AbilityBuilder, createMongoAbility, type MongoAbility } from '@casl/ability';
+
+export type AppAction =
+  | 'manage'
+  | 'create'
+  | 'read'
+  | 'update'
+  | 'delete'
+  | 'approve'
+  | 'reject'
+  | 'fund'
+  | 'publish'
+  | 'unpublish'
+  | 'rollback'
+  | 'suspend'
+  | 'ban'
+  | 'remove'
+  | 'adjust';
+
+export type AppSubject =
+  | 'User'
+  | 'Game'
+  | 'Idea'
+  | 'RoadmapItem'
+  | 'Contribution'
+  | 'PipelineRun'
+  | 'Release'
+  | 'WalletTransaction'
+  | 'Report'
+  | 'AuditLog'
+  | 'all';
+
+export type AppAbility = MongoAbility<[AppAction, AppSubject]>;
+
+export interface AbilityUser {
+  id: string;
+  role: 'visitor' | 'free' | 'supporter' | 'creator' | 'super_admin';
+  // Any additional fields needed for condition-based rules (e.g., ownedGameIds).
+}
+
+export function defineAbilitiesFor(user: AbilityUser | null): AppAbility {
+  const { can, cannot, build } = new AbilityBuilder<AppAbility>(createMongoAbility);
+
+  // Visitor / logged-out.
+  can('read', 'Game');
+
+  if (user?.role === 'super_admin') {
+    can('manage', 'all');
+  }
+
+  if (user?.role === 'creator' || user?.role === 'super_admin') {
+    can(['update', 'publish', 'unpublish', 'rollback'], 'Game', { ownerUserId: user.id });
+  }
+
+  // ...rest of the matrix...
+
+  return build();
+}
+```
+
+- **Subject strings, not classes.** We match against a literal subject string (e.g. `'Game'`) and, where ownership matters, pass a resource-typed object via `subject('Game', game)` so MongoDB-style conditions (`{ ownerUserId: user.id }`) evaluate.
+- Use `manage` + `'all'` sparingly — only super admin should get it.
+- Keep rules readable: group by role, not by subject.
+
+## NestJS integration (`apps/api`)
+
+There is no official `@casl/nestjs`. Follow this canonical pattern (adapted from the NestJS docs):
+
+```ts
+// apps/api/src/casl/casl-ability.factory.ts
+import { Injectable } from '@nestjs/common';
+import { defineAbilitiesFor, type AbilityUser, type AppAbility } from '@gamevine/shared';
+
+@Injectable()
+export class CaslAbilityFactory {
+  createForUser(user: AbilityUser | null): AppAbility {
+    return defineAbilitiesFor(user);
+  }
+}
+```
+
+```ts
+// apps/api/src/casl/check-policies.decorator.ts
+import { SetMetadata } from '@nestjs/common';
+import type { AppAbility } from '@gamevine/shared';
+
+export type PolicyHandler = (ability: AppAbility) => boolean;
+export const CHECK_POLICIES_KEY = 'check_policy';
+export const CheckPolicies = (...handlers: PolicyHandler[]) =>
+  SetMetadata(CHECK_POLICIES_KEY, handlers);
+```
+
+```ts
+// apps/api/src/casl/policies.guard.ts
+@Injectable()
+export class PoliciesGuard implements CanActivate {
+  constructor(
+    private readonly reflector: Reflector,
+    private readonly caslFactory: CaslAbilityFactory,
+  ) {}
+
+  canActivate(ctx: ExecutionContext): boolean {
+    const handlers =
+      this.reflector.get<PolicyHandler[]>(CHECK_POLICIES_KEY, ctx.getHandler()) ?? [];
+    const req = ctx.switchToHttp().getRequest();
+    const ability = this.caslFactory.createForUser(req.user ?? null);
+    return handlers.every((h) => h(ability));
+  }
+}
+```
+
+Usage in a controller:
+
+```ts
+@UseGuards(AuthGuard, PoliciesGuard)
+@Controller('ideas')
+export class IdeasController {
+  @Post(':id/approve')
+  @CheckPolicies((ability) => ability.can('approve', 'Idea'))
+  approve(@Param('id') id: string) {
+    return this.ideas.approve(id);
+  }
+}
+```
+
+For **ownership-scoped** actions, load the resource in the service and check `ability.can('update', subject('Game', game))`:
+
+```ts
+import { subject } from '@casl/ability';
+// ...
+async update(user: AbilityUser, id: string, patch: UpdateGameRequest) {
+  const game = await this.games.getById(id);
+  const ability = this.caslFactory.createForUser(user);
+  if (!ability.can('update', subject('Game', game))) {
+    throw new ForbiddenException();
+  }
+  // ...
+}
+```
+
+## React integration (`apps/web`)
+
+Use `@casl/react` for UI gating. The authenticated user's rules arrive from the API (`GET /me` returns `{ user, rules }` where `rules` is `ability.rules`). The web app rehydrates:
+
+```tsx
+// apps/web/src/lib/ability.ts
+'use client';
+import { createContext } from 'react';
+import { createContextualCan, useAbility as baseUseAbility } from '@casl/react';
+import { createMongoAbility } from '@casl/ability';
+import type { AppAbility } from '@gamevine/shared';
+
+export const AbilityContext = createContext<AppAbility>(createMongoAbility<AppAbility>());
+export const Can = createContextualCan(AbilityContext.Consumer);
+export const useAbility = () => baseUseAbility(AbilityContext);
+```
+
+Provide at the authenticated root (client component):
+
+```tsx
+// apps/web/src/app/(authenticated)/providers.tsx
+'use client';
+import { useMemo } from 'react';
+import { createMongoAbility } from '@casl/ability';
+import type { RawRuleOf } from '@casl/ability';
+import type { AppAbility } from '@gamevine/shared';
+import { AbilityContext } from '@/lib/ability';
+
+export function AbilityProvider({
+  rules,
+  children,
+}: {
+  rules: RawRuleOf<AppAbility>[];
+  children: React.ReactNode;
+}) {
+  const ability = useMemo(() => createMongoAbility<AppAbility>(rules), [rules]);
+  return <AbilityContext.Provider value={ability}>{children}</AbilityContext.Provider>;
+}
+```
+
+Gate UI:
+
+```tsx
+<Can I="approve" a="Idea">
+  <Button onClick={approve}>Approve</Button>
+</Can>
+
+<Can I="update" this={game}>
+  <EditButton />
+</Can>
+```
+
+Or imperatively:
+
+```tsx
+const ability = useAbility();
+if (ability.can('publish', subject('Game', game))) {
+  return <PublishButton />;
+}
+```
+
+## Non-negotiables
+
+- **Client-side `Can` is a UX hint, not a gate.** Every write must be re-checked by `PoliciesGuard` on the API. If your UI gates an action the API doesn't gate, the API is wrong, fix the API.
+- **No inline role checks.** `if (user.role === 'creator')` in a component or service is forbidden. Use `ability.can(...)`. If CASL can't express what you need, extend the ability definition in `@gamevine/shared`, don't work around it.
+- **Single ability factory.** All rule-building happens in `defineAbilitiesFor(user)` in `@gamevine/shared`. API wraps it in `CaslAbilityFactory`; web rehydrates from serialized rules. Do not build abilities in two places.
+- **Rule changes are cross-app contract changes.** Run the `schema-sync` subagent after edits to `packages/shared/src/abilities/**` — both apps depend on these types.
+- **Ownership via conditions, not code branches.** Prefer `can('update', 'Game', { ownerUserId: user.id })` over building parallel runtime checks.
+
+## Forbidden
+
+- Importing `@casl/ability` directly in a controller or React component without going through the shared `defineAbilitiesFor` / `AbilityContext`.
+- Reading `user.role` in `apps/web/src/**` or `apps/api/src/**` feature code. That logic belongs in ability rules.
+- Defining abilities inside a NestJS service (they drift from the web definition). The service calls `CaslAbilityFactory.createForUser(user)`.
+- Returning raw permission booleans from an API endpoint when you could return CASL rules and let the client derive them. One source, always.
+- Relying on client-side `Can` for any security-sensitive action without a matching server-side `@CheckPolicies`.
+
+## References
+
+- CASL docs: https://casl.js.org/v6/en/
+- Context7: `/stalniy/casl`
+- NestJS + CASL pattern: https://docs.nestjs.com/security/authorization#integrating-casl
+- Role matrix this rule implements: `docs/product/users-roles-and-permissions.md`
