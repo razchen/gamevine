@@ -103,12 +103,12 @@ const FIXED_GENERATION_TARGET = [
 
 const FIXED_FEATURE_UPDATE = [
   'Apply one small feature update to the existing Breakout game.',
-  'Feature: add pause/resume support when the player presses the "P" key.',
+  'Feature: add exploding blocks that damage neighboring bricks when hit.',
   'Requirements:',
-  '- show a clear paused overlay or label',
-  '- freeze gameplay while paused',
-  '- keep the rest of the game behavior intact',
-  '- add a short on-screen hint that teaches the control',
+  '- when the ball breaks a brick, nearby bricks in a small radius should also break',
+  '- make the explosion effect visually clear to the player',
+  '- keep scoring, lives, and the rest of the gameplay behavior intact',
+  '- add a short on-screen hint that explains the exploding blocks mechanic',
   'Do not add dependencies or modify files outside the approved editable set.',
 ].join('\n');
 

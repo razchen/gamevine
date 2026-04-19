@@ -335,49 +335,58 @@ describe('PocService flows', () => {
     expect(result.preview).not.toBeNull();
   });
 
-  it('reads only the tracked template allowlist from the real template config', async () => {
-    const trackedTemplatesRoot = resolve(repoRoot, '.gamevine/poc-templates');
-    const runsParent = join(repoRoot, '.gamevine');
-    await mkdir(runsParent, { recursive: true });
-    const runsRoot = await mkdtemp(join(runsParent, 'gamevine-poc-real-template-'));
-    tempRoots.push(runsRoot);
+  it.each([{ templateId: 'breakout-basic' }])(
+    'reads only the tracked template allowlist from the real template config for $templateId',
+    async ({ templateId }) => {
+      const trackedTemplatesRoot = resolve(repoRoot, '.gamevine/poc-templates');
+      const runsParent = join(repoRoot, '.gamevine');
+      await mkdir(runsParent, { recursive: true });
+      const runsRoot = await mkdtemp(join(runsParent, 'gamevine-poc-real-template-'));
+      tempRoots.push(runsRoot);
+      const templateConfig = JSON.parse(
+        await readFile(join(trackedTemplatesRoot, templateId, 'template.config.json'), 'utf8'),
+      ) as {
+        editableFiles: string[];
+      };
 
-    const config = {
-      isProduction: false,
-      aiApiKey: 'test-key',
-      aiBaseUrl: 'https://openrouter.ai/api/v1',
-      aiModel: 'gpt-5.2',
-      pocApiEnabled: true,
-      pocMaxConcurrentRuns: 1,
-      pocRunsDir: join(runsRoot, 'runs'),
-      pocTemplatesRoot: trackedTemplatesRoot,
-    } satisfies Pick<
-      AppConfigService,
-      | 'isProduction'
-      | 'aiApiKey'
-      | 'aiBaseUrl'
-      | 'aiModel'
-      | 'pocApiEnabled'
-      | 'pocMaxConcurrentRuns'
-      | 'pocRunsDir'
-      | 'pocTemplatesRoot'
-    >;
+      const config = {
+        isProduction: false,
+        aiApiKey: 'test-key',
+        aiBaseUrl: 'https://openrouter.ai/api/v1',
+        aiModel: 'gpt-5.2',
+        pocApiEnabled: true,
+        pocMaxConcurrentRuns: 1,
+        pocRunsDir: join(runsRoot, 'runs'),
+        pocTemplatesRoot: trackedTemplatesRoot,
+      } satisfies Pick<
+        AppConfigService,
+        | 'isProduction'
+        | 'aiApiKey'
+        | 'aiBaseUrl'
+        | 'aiModel'
+        | 'pocApiEnabled'
+        | 'pocMaxConcurrentRuns'
+        | 'pocRunsDir'
+        | 'pocTemplatesRoot'
+      >;
 
-    const service = new PocService(config as AppConfigService);
-    services.push(service);
-    global.fetch = jest.fn().mockResolvedValue(successfulModelResponse());
+      const service = new PocService(config as AppConfigService);
+      services.push(service);
+      global.fetch = jest.fn().mockResolvedValue(successfulModelResponse());
 
-    const result = await service.createGenerationRun({
-      templateId: 'breakout-basic',
-    });
+      const result = await service.createGenerationRun({
+        templateId,
+      });
 
-    const prompt = await readFile(join(config.pocRunsDir, result.runId, 'prompt.txt'), 'utf8');
-    expect(prompt).toContain('--- FILE: src/index.html ---');
-    expect(prompt).toContain('--- FILE: src/main.js ---');
-    expect(prompt).toContain('--- FILE: src/styles.css ---');
-    expect(prompt).not.toContain('--- FILE: build.mjs ---');
-    expect(prompt).not.toContain('--- FILE: package.json ---');
-  });
+      const prompt = await readFile(join(config.pocRunsDir, result.runId, 'prompt.txt'), 'utf8');
+      for (const file of templateConfig.editableFiles) {
+        expect(prompt).toContain(`--- FILE: ${file} ---`);
+      }
+      expect(prompt).not.toContain('--- FILE: build.mjs ---');
+      expect(prompt).not.toContain('--- FILE: package.json ---');
+      expect(result.build.success).toBe(true);
+    },
+  );
 
   it('creates a feature-update run from a completed generation run', async () => {
     const { service, runsDir, templateDir, templateId } = await makeService();
@@ -395,9 +404,9 @@ describe('PocService flows', () => {
       )
       .mockResolvedValueOnce(
         successfulModelResponse({
-          summary: 'Add pause and resume support',
+          summary: 'Add exploding blocks',
           content:
-            'document.body.innerHTML = "<main><h1>Breakout Ready</h1><p>Press Space to start.</p><p>Press P to pause.</p></main>";\n',
+            'document.body.innerHTML = "<main><h1>Breakout Ready</h1><p>Press Space to start.</p><p>Exploding blocks are active. Hit a brick to trigger a blast.</p></main>";\n',
           inputTokens: 12,
           outputTokens: 22,
           totalTokens: 34,
@@ -436,7 +445,7 @@ describe('PocService flows', () => {
     });
 
     expect(feature.build.success).toBe(true);
-    expect(feature.summary).toMatch(/pause/i);
+    expect(feature.summary).toMatch(/exploding blocks/i);
     expect(feature.preview?.url).toMatch(/^http:\/\/127\.0\.0\.1:\d+\/$/);
 
     await expect(readFile(join(runsDir, feature.runId, 'prompt.txt'), 'utf8')).resolves.toContain(
@@ -445,12 +454,15 @@ describe('PocService flows', () => {
     await expect(readFile(join(runsDir, feature.runId, 'prompt.txt'), 'utf8')).resolves.toContain(
       'Breakout Ready',
     );
+    await expect(readFile(join(runsDir, feature.runId, 'prompt.txt'), 'utf8')).resolves.toContain(
+      'Feature: add exploding blocks that damage neighboring bricks when hit.',
+    );
     await expect(
       readFile(join(runsDir, feature.runId, 'prompt.txt'), 'utf8'),
     ).resolves.not.toContain('Template Changed On Disk');
     await expect(
       readFile(join(runsDir, feature.runId, 'workspace', 'src', 'main.js'), 'utf8'),
-    ).resolves.toContain('Press P to pause.');
+    ).resolves.toContain('Exploding blocks are active');
   });
 
   it('creates a bug-fix run from a completed feature-update run', async () => {
@@ -465,9 +477,9 @@ describe('PocService flows', () => {
         totalTokens: 30,
       }),
       successfulModelResponse({
-        summary: 'Add pause and resume support',
+        summary: 'Add exploding blocks',
         content:
-          'document.body.innerHTML = "<main><h1>Breakout Ready</h1><p>Press Space to start.</p><p>Use the arrow keys to move.</p><p>Press P to pause.</p></main>";\n',
+          'document.body.innerHTML = "<main><h1>Breakout Ready</h1><p>Press Space to start.</p><p>Use the arrow keys to move.</p><p>Exploding blocks are active. Hit a brick to trigger a blast.</p></main>";\n',
         inputTokens: 12,
         outputTokens: 22,
         totalTokens: 34,
@@ -475,7 +487,7 @@ describe('PocService flows', () => {
       successfulModelResponse({
         summary: 'Increase arrow-key paddle speed',
         content:
-          'document.body.innerHTML = "<main><h1>Breakout Ready</h1><p>Press Space to start.</p><p>Arrow-key movement is now twice as fast.</p><p>Press P to pause.</p></main>";\n',
+          'document.body.innerHTML = "<main><h1>Breakout Ready</h1><p>Press Space to start.</p><p>Arrow-key movement is now twice as fast.</p><p>Exploding blocks are active. Hit a brick to trigger a blast.</p></main>";\n',
         inputTokens: 14,
         outputTokens: 24,
         totalTokens: 38,
