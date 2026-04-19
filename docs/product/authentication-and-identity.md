@@ -4,13 +4,13 @@
 
 - This document defines how people sign up, sign in, and manage their identity on Gamevine.ai at launch.
 - Auth is the gate for every paid action (subscribing, buying credits, submitting ideas, creating games). It must be fast, boring, and secure.
-- Launch uses **Supabase Auth** behind the NestJS API, with a thin identity model the platform owns (Supabase is the auth provider, the `users` row and wallet are platform-owned).
+- Launch uses **in-house authentication** inside the NestJS API: email/password with `argon2id` hashing, Google OAuth 2.0 for social sign-in, opaque server-side sessions delivered via HTTP-only cookies, and transactional emails through a single provider. No third-party auth provider sits in front of the API.
 
 # Goals
 
 - Let a visitor go from landing page to "playing a game" in under 30 seconds without signing in.
 - Let a subscriber go from "I want to participate" to "first paid action" in under 2 minutes.
-- Keep the launch auth surface small (one real provider + Google OAuth) so support, recovery, and security stories stay simple.
+- Keep the launch auth surface small (email/password + Google OAuth only) so support, recovery, and security stories stay simple.
 
 # In Scope
 
@@ -75,28 +75,37 @@
 
 # Backend Notes
 
-- Supabase provides the credential store and OAuth brokering; NestJS API mints its own session cookie after verifying the Supabase JWT and upserting the platform `users` row.
-- Platform `users` table owns: `id`, `supabase_user_id`, `email`, `handle`, `display_name`, `avatar_url`, `created_at`, `email_verified_at`, `terms_accepted_at`, `age_confirmed_at`, `deleted_at`.
-- Wallet, subscription, and permissions live in platform tables keyed off `users.id`, not the Supabase user id.
+- Credentials, sessions, and auth tokens live in platform-owned Postgres tables managed by Drizzle. The NestJS API is the sole authority; no external provider brokers sign-in.
+- Platform `users` table owns: `id`, `email` (citext, unique), `password_hash` (argon2id, nullable — OAuth-only accounts have no password), `google_sub` (unique, nullable — the Google OAuth subject claim, used for re-linking across email changes), `handle`, `display_name`, `avatar_url`, `created_at`, `email_verified_at`, `terms_accepted_at`, `age_confirmed_at`, `deleted_at`.
+- Auxiliary auth tables:
+  - `auth_sessions` — server-side session records keyed by a token **hash**, with `user_id`, `created_at`, `last_seen_at`, `expires_at`, `user_agent`, `ip_hash`, `revoked_at`.
+  - `email_verification_tokens` and `password_reset_tokens` — store **hashes** of single-use tokens with `expires_at` and `consumed_at`; the raw token only ever exists in the outbound email.
+  - `totp_secrets` — super-admin only; stores an encrypted TOTP secret and `enrolled_at`.
+- Wallet, subscription, permissions, and all other platform data key off `users.id`.
+- Google OAuth is implemented as a standard authorization-code flow (Google's OIDC endpoints); the API verifies the ID token signature and uses the `sub` claim (stored as `google_sub`) as the stable identifier.
 
 # Technical Notes
 
+- **Password hashing**: `argon2id`. Parameters tuned to ~250 ms on production hardware (starting baseline follows the current OWASP cheat sheet: `m=19 MiB, t=2, p=1`). Parameters live in config so they can be increased without a migration.
+- **Sessions**: cookies carry a **32-byte opaque random token** (base64url); the server looks it up in `auth_sessions` by its SHA-256 hash. No JWTs in cookies. Sessions slide on every authenticated request and are hard-expired at 30 days of inactivity (matches the Product Rule above).
+- **Session invalidation**: sign-out revokes the current session row; password change and email change revoke all of that user's sessions.
 - Cookies: `HttpOnly`, `Secure`, `SameSite=Lax`, scoped to the app domain (not the player-bundle subdomain — see `player-runtime-and-sandbox.md`).
 - CSRF: double-submit cookie pattern for mutating routes.
 - All auth emails sent through a single transactional provider (Resend or Postmark); sender identity is `no-reply@gamevine.ai`.
+- **Verification / reset tokens**: 32-byte random values, delivered only in email, stored as SHA-256 hashes, single-use, `consumed_at` set on redemption. Expiries: reset `1 hour` (matches the acceptance criterion above), verification `24 hours` with a resend action.
 
 # Edge Cases
 
 - User signs up with a disposable-email domain → allowed at launch; flagged for future policy.
 - User deletes account while holding pledged credits on open roadmap items → pledges auto-refund on deletion; see `credits-and-monetization.md`.
 - User changes email while another action is in flight → current session stays valid; new verification required on next sensitive action.
-- Google account email changes upstream → next sign-in re-links by `supabase_user_id`, not email.
+- Google account email changes upstream → next sign-in re-links by `google_sub`, not email.
 - Bot signups → reCAPTCHA/Turnstile on the signup and reset forms.
 
 # Open Questions
 
 - Deferred: magic-link sign-in. Revisit after launch.
-- Deferred: passkeys. Revisit when Supabase's passkey support matures.
+- Deferred: passkeys (WebAuthn). Revisit once the in-house email/password + Google flow is stable and there's demand.
 
 # Suggested Epics
 
