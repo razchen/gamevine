@@ -102,7 +102,14 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.22 0.02 255);
 
-  --primary: oklch(0.48 0.14 260);
+  /*
+   * Deep indigo CTA. The earlier oklch(0.48 0.14 260) read as a generic
+   * mid-blue next to the near-white canvas; dropping lightness and nudging
+   * chroma/hue gives a richer, inkier indigo that feels intentional rather
+   * than "SaaS default". Dark-mode --primary stays at 0.70L for legibility
+   * on the dark canvas — the two are paired by hue, not by raw values.
+   */
+  --primary: oklch(0.36 0.16 265);
   --primary-foreground: oklch(0.99 0 0);
 
   --secondary: oklch(0.97 0.005 255);
@@ -119,10 +126,10 @@
 
   --border: oklch(0.9 0.01 255);
   --input: oklch(0.9 0.01 255);
-  --ring: oklch(0.48 0.14 260);
+  --ring: oklch(0.36 0.16 265);
 
   /* Brand-anchored 5-step chart ramp: indigo → neutral → amber. */
-  --chart-1: oklch(0.48 0.14 260);
+  --chart-1: oklch(0.36 0.16 265);
   --chart-2: oklch(0.55 0.08 260);
   --chart-3: oklch(0.6 0.02 255);
   --chart-4: oklch(0.6 0.08 80);
@@ -132,12 +139,12 @@
 
   --sidebar: oklch(0.99 0.003 255);
   --sidebar-foreground: oklch(0.22 0.02 255);
-  --sidebar-primary: oklch(0.48 0.14 260);
+  --sidebar-primary: oklch(0.36 0.16 265);
   --sidebar-primary-foreground: oklch(0.99 0 0);
   --sidebar-accent: oklch(0.97 0.005 255);
   --sidebar-accent-foreground: oklch(0.22 0.02 255);
   --sidebar-border: oklch(0.9 0.01 255);
-  --sidebar-ring: oklch(0.48 0.14 260);
+  --sidebar-ring: oklch(0.36 0.16 265);
 
   /* Product-specific tokens. */
   --credits: oklch(0.58 0.14 80);
