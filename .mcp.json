@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "linear": {
+      "type": "stdio",
+      "command": "pnpm",
+      "args": ["dlx", "mcp-remote", "https://mcp.linear.app/mcp"],
+      "env": {}
+    }
+  }
+}
