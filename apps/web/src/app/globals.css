@@ -84,9 +84,16 @@
 /* -------------------------------------------------------------------------- */
 /* Light mode — Graphite                                                      */
 /* Cool ink neutrals, indigo CTA (`--primary`), amber credits.                */
+/*                                                                            */
+/* `.light` is aliased to `:root` so a descendant can force light mode even   */
+/* when an ancestor (e.g. `<html class="dark">`) resolved to dark. Needed for */
+/* side-by-side previews in the component gallery at `/design/ui`. No runtime */
+/* behavior change — in normal app flow `<html>` is either `light` or `dark`, */
+/* and the `light` class just re-asserts the same vars `:root` already sets.  */
 /* -------------------------------------------------------------------------- */
 
-:root {
+:root,
+.light {
   --background: oklch(0.99 0.003 255);
   --foreground: oklch(0.22 0.02 255);
 

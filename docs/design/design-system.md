@@ -6,14 +6,48 @@ This document covers:
 
 1. The chosen production palette (Graphite).
 2. How Graphite's tokens map onto the shadcn API in `globals.css`.
-3. How the design sandbox is structured and when to still use it.
+3. The two design surfaces under `/design` and what each is for.
 4. The semantic token contract the sandbox uses.
 
 ## TL;DR
 
 - **Graphite** is the production palette. Its tokens live in `apps/web/src/app/globals.css` under the standard shadcn names (`--background`, `--primary`, `--accent`, etc.).
 - The app respects OS preference by default via `next-themes` (`defaultTheme="system"`). No in-app toggle exists yet — that lands when the real app shell does.
-- The design sandbox at `/design` still exists behind `NEXT_PUBLIC_DESIGN_SANDBOX=1` as a re-theming scratchpad. It uses an independent `--color-gv-*` token set so experiments there don't bleed into production.
+- `/design` is a development-only surface behind `NEXT_PUBLIC_DESIGN_SANDBOX=1`. Two siblings live under it: **`(sandbox)`** — palette / font / density scratchpad on its own `--color-gv-*` tokens — and **`/design/ui`** — production-token component gallery rendering real shadcn primitives.
+
+## Two surfaces under `/design`
+
+The outer `apps/web/src/app/design/layout.tsx` is a pure flag gate. Two sibling route groups live underneath, each with its own shell:
+
+| Route         | Purpose                                              | Tokens                                      |
+| ------------- | ---------------------------------------------------- | ------------------------------------------- |
+| `/design/*`\* | Palette / theme / font / density scratchpad.         | `--color-gv-*` in `_styles/sandbox.css`     |
+| `/design/ui`  | Production-token component gallery. Real primitives. | Shadcn tokens from `globals.css` (Graphite) |
+
+\* Served by the `(sandbox)` route group — parentheses don't show up in URLs.
+
+Mapping of files on disk:
+
+```
+apps/web/src/app/design/
+├── layout.tsx               # flag gate, no chrome
+├── _components/             # sandbox primitives + switcher + nav
+├── _fixtures/               # sandbox mock data
+├── _styles/sandbox.css      # --color-gv-* tokens
+├── (sandbox)/
+│   ├── layout.tsx           # sandbox shell (fonts, ThemeProvider, switcher, nav)
+│   ├── page.tsx
+│   ├── browse/              # … and the other 7 surfaces
+│   └── …
+└── ui/
+    ├── layout.tsx           # gallery shell + <Toaster />
+    ├── _components/
+    │   ├── component-example.tsx   # side-by-side light/dark wrapper
+    │   └── ui-nav.tsx
+    ├── page.tsx             # component index
+    ├── buttons/             # and 8 other primitive pages
+    └── …
+```
 
 ## Graphite → shadcn mapping
 
@@ -60,9 +94,36 @@ Three families are added because shadcn doesn't cover them. They're threaded thr
 
 No user-facing toggle exists yet. When one is added, it will be a single shadcn Select or SegmentedControl feeding `useTheme()` — no new providers or tokens needed.
 
-## The design sandbox
+### The `.light` alias
 
-The sandbox still exists at `/design` as an isolated re-theming scratchpad. It is **not** a mirror of production; it maintains its own `--color-gv-*` token set so palette experiments can't bleed into shipped UI.
+`globals.css` declares its light tokens on `:root, .light`. That lets a descendant force light mode even when `<html>` is currently `.dark` — necessary for the component gallery's side-by-side previews. In the normal app flow `<html>` is either `.light` or `.dark`, so the alias is a no-op for users.
+
+## The `/design/ui` component gallery
+
+`/design/ui` renders every shadcn primitive we ship, using the Graphite tokens exactly as production does. Nothing here is re-themed. If a button looks wrong in the gallery, it looks wrong in the app.
+
+### Side-by-side light/dark technique
+
+Every example is wrapped in `ComponentExample`, which renders the children twice:
+
+- **Left pane** — wrapped in a `<div class="light">`. Graphite light tokens cascade into this subtree.
+- **Right pane** — wrapped in a `<div class="dark">`. The `@custom-variant dark (&:is(.dark *))` rule in `globals.css` flips to the dark overrides.
+
+Children render as two independent React instances per example. If a caller passes a stateful child (controlled input, open Dialog, etc.), each pane owns its own state. Deliberate — a "sync both" option would require lifting state out of the gallery.
+
+### Portaled primitives
+
+Dialog content, Tooltip content, and Sonner toasts all portal to `document.body` — outside the scoped `.light` / `.dark` wrappers. Side-by-side would show the same live theme in both panes for those.
+
+`ComponentExample` handles this with the `unportaled={false}` prop: the example renders a single preview that tracks the live app theme, with an inline note explaining why. Use it on every portaled primitive.
+
+### The sonner mount
+
+A single `<Toaster />` is mounted in `apps/web/src/app/design/ui/layout.tsx` so any gallery page can trigger toasts. It is NOT mounted globally — production decides where toasts live.
+
+## The sandbox
+
+The `(sandbox)` route group lives at `/design` (and `/design/browse`, `/design/wallet`, etc.) as an isolated re-theming scratchpad. It is **not** a mirror of production; it maintains its own `--color-gv-*` token set so palette experiments can't bleed into shipped UI.
 
 ```bash
 # one-time — copy the example env
@@ -77,7 +138,7 @@ If the flag is off (including in production), the entire `/design/*` subtree ret
 
 ### What the sandbox includes
 
-Route group at `apps/web/src/app/design/`:
+Files under `apps/web/src/app/design/(sandbox)/`:
 
 | Path                 | What it tests                                   |
 | -------------------- | ----------------------------------------------- |
@@ -150,6 +211,7 @@ The sandbox's semantic tokens live in `apps/web/src/app/design/_styles/sandbox.c
 
 ## Boundaries
 
-- Do not link to `/design/*` from any production route.
+- Do not link to `/design/*` or `/design/ui/*` from any production route.
 - Do not import `_fixtures/*` from outside the sandbox.
 - The sandbox's `--color-gv-*` tokens are a **separate namespace** from production's shadcn tokens. Don't cross the streams — the production app reads `--primary`, not `--color-gv-accent`.
+- The `/design/ui` gallery, by contrast, reads production tokens directly. That's the whole point — it's a mirror, not a scratchpad.
