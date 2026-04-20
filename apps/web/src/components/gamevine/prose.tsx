@@ -5,12 +5,11 @@ import { cn } from '@/lib/utils';
 /**
  * Long-form text container. Applies `@tailwindcss/typography`'s `prose`
  * styles plus the local `prose-gv` modifier (defined in `globals.css`)
- * which retints links, code, blockquotes, and bullets to product tokens
- * (`--primary`, `--muted-foreground`, `--border`) instead of the plugin's
- * slate/zinc defaults.
- *
- * Pair with `dark:prose-invert` for dark-mode body text — that's already
- * wired into the className below.
+ * which routes every prose token through our shadcn CSS vars
+ * (`--foreground`, `--muted-foreground`, `--border`, `--primary`,
+ * `--muted`). Dark mode falls out of the cascade automatically — do NOT
+ * also pair this with `dark:prose-invert`, that would override the
+ * scoped tokens used by the side-by-side gallery panes.
  *
  * Server-component safe.
  */
@@ -32,7 +31,7 @@ export function Prose({ children, size = 'base', className }: ProseProps) {
   return (
     <div
       data-slot="prose"
-      className={cn('prose prose-gv dark:prose-invert max-w-none', SIZE_CLASSES[size], className)}
+      className={cn('prose prose-gv max-w-none', SIZE_CLASSES[size], className)}
     >
       {children}
     </div>

@@ -102,38 +102,38 @@ Each has a gallery page at `/design/ui/<name>` exercising its meaningful variant
 
 ### Composites in `gamevine/` (9)
 
-| Composite      | Purpose                                                                  | Notes                                                                                                                            |
-| -------------- | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
-| `PageHeader`   | Title + optional eyebrow + description + right-side action slot.         | Used at the top of every gallery page and (eventually) every product page. Replaces ad-hoc `<header><h1>…</h1></header>` blocks. |
-| `EmptyState`   | Centred zero-data placeholder with icon, copy, and optional CTA.         | Use whenever a list / grid / table renders zero rows.                                                                            |
-| `StatCard`     | Single-metric tile with value, label, optional trend delta and icon.     | Tone variants colour the accent strip.                                                                                           |
-| `CreditChip`   | Canonical credits display.                                               | Centralises `Intl.NumberFormat` so every surface shows "1,200" not "1200". Sizes, tones, signed deltas, optional suffix.         |
-| `StatusBadge`  | Game-state badge with label + tone + icon mapped from a status enum.     | See caveat below.                                                                                                                |
-| `PlayerAvatar` | Avatar wrapper with auto-initials fallback and presence dot.             | Hover-card integration is a future TODO once Tier 3 primitives ship.                                                             |
-| `FormField`    | One-line wrapper over the shadcn `Form` primitive set (RHF + zod).       | Render-prop API: `<FormField …>{(field) => <Input {...field} />}</FormField>`. Collapses the five-line FormItem boilerplate.     |
-| `Prose`        | Long-form text container.                                                | Wraps `@tailwindcss/typography`'s `prose` plus the local `prose-gv` modifier (below). Pair with `dark:prose-invert` (built in).  |
-| `DataTable`    | TanStack Table headless core composed with the shadcn `Table` primitive. | Click-to-sort, single global filter input, page-size selector + pagination footer. Re-exports `ColumnDef<T>` for column defs.    |
+| Composite      | Purpose                                                                  | Notes                                                                                                                                                              |
+| -------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `PageHeader`   | Title + optional eyebrow + description + right-side action slot.         | Used at the top of every gallery page and (eventually) every product page. Replaces ad-hoc `<header><h1>…</h1></header>` blocks.                                   |
+| `EmptyState`   | Centred zero-data placeholder with icon, copy, and optional CTA.         | Use whenever a list / grid / table renders zero rows.                                                                                                              |
+| `StatCard`     | Single-metric tile with value, label, optional trend delta and icon.     | Tone variants colour the accent strip.                                                                                                                             |
+| `CreditChip`   | Canonical credits display.                                               | Centralises `Intl.NumberFormat` so every surface shows "1,200" not "1200". Sizes, tones, signed deltas, optional suffix.                                           |
+| `StatusBadge`  | Game-state badge with label + tone + icon mapped from a status enum.     | See caveat below.                                                                                                                                                  |
+| `PlayerAvatar` | Avatar wrapper with auto-initials fallback and presence dot.             | Hover-card integration is a future TODO once Tier 3 primitives ship.                                                                                               |
+| `FormField`    | One-line wrapper over the shadcn `Form` primitive set (RHF + zod).       | Render-prop API: `<FormField …>{(field) => <Input {...field} />}</FormField>`. Collapses the five-line FormItem boilerplate.                                       |
+| `Prose`        | Long-form text container.                                                | Wraps `@tailwindcss/typography`'s `prose` plus the local `prose-gv` modifier (below). Dark mode falls out of token cascade — do NOT pair with `dark:prose-invert`. |
+| `DataTable`    | TanStack Table headless core composed with the shadcn `Table` primitive. | Click-to-sort, single global filter input, page-size selector + pagination footer. Re-exports `ColumnDef<T>` for column defs.                                      |
 
 Every composite has a gallery page at `/design/ui/<kebab-name>` showing realistic usage (not just an empty stub).
 
 ### The `prose-gv` modifier
 
-`@tailwindcss/typography` ships sensible defaults — but those defaults default to slate / zinc, which clash with Graphite. `prose-gv` is a local modifier defined in `apps/web/src/app/globals.css` that overrides the relevant `--tw-prose-*` variables to point at our product tokens:
+`@tailwindcss/typography` ships sensible defaults — but those defaults default to slate / zinc, which clash with Graphite. `prose-gv` is a local modifier defined in `apps/web/src/app/globals.css` that overrides every relevant `--tw-prose-*` variable to point at our shadcn CSS vars:
 
-| `prose` element             | Default token (slate/zinc) | `prose-gv` token                            |
-| --------------------------- | -------------------------- | ------------------------------------------- |
-| Links                       | slate                      | `var(--primary)`                            |
-| Code (inline + block)       | slate                      | `var(--foreground)`                         |
-| Code-block background       | zinc-900                   | `var(--muted)`                              |
-| Blockquote text             | slate                      | `var(--foreground)`                         |
-| Blockquote borders          | slate                      | `var(--border)`                             |
-| Bullets / counters          | slate                      | `var(--muted-foreground)` / `var(--border)` |
-| Horizontal rule             | slate                      | `var(--border)`                             |
-| Table header / cell borders | slate                      | `var(--border)`                             |
+| `prose` element             | Default token (slate/zinc) | `prose-gv` token          |
+| --------------------------- | -------------------------- | ------------------------- |
+| Body / headings / quotes    | slate                      | `var(--foreground)`       |
+| Links                       | slate                      | `var(--primary)`          |
+| Bullets / counters / lead   | slate                      | `var(--muted-foreground)` |
+| Code (inline + block)       | slate                      | `var(--foreground)`       |
+| Code-block background       | zinc-900                   | `var(--muted)`            |
+| Blockquote borders          | slate                      | `var(--border)`           |
+| Horizontal rule             | slate                      | `var(--border)`           |
+| Table header / cell borders | slate                      | `var(--border)`           |
 
-The dark variant is paired via `--tw-prose-invert-*` overrides under `.dark .prose-gv`, so `dark:prose-invert` keeps working as the plugin expects.
+There is **no** companion `--tw-prose-invert-*` block. Dark mode falls out of the cascade for free — `--foreground`, `--muted`, `--border`, etc. already swap between the `:root` / `.light` and `.dark` blocks, and prose-gv just points at them. **Do not pair `<Prose>` (or raw `.prose-gv`) with `dark:prose-invert`** — that would override our scoped tokens whenever an ancestor has the `.dark` class, which breaks the side-by-side `.light` / `.dark` panes in the gallery.
 
-Use it via `<Prose>` (which already has `prose prose-gv dark:prose-invert max-w-none` baked in) rather than reaching for the raw classes.
+Use it via `<Prose>` (which already has `prose prose-gv max-w-none` baked in) rather than reaching for the raw classes.
 
 ### `StatusBadge` placeholder caveat
 
