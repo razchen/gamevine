@@ -8,18 +8,17 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import { PageHeader } from '@/components/gamevine';
 import { ComponentExample } from '../_components/component-example';
 
 export default function BreadcrumbPageDemo() {
   return (
     <>
-      <header className="flex flex-col gap-1">
-        <h1 className="text-foreground text-2xl font-semibold tracking-tight">Breadcrumb</h1>
-        <p className="text-muted-foreground text-sm">
-          Ancestor trail for deep hierarchies (manage → game → release → review). Current page uses
-          BreadcrumbPage (not a link) so it matches WAI-ARIA.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Primitives"
+        title="Breadcrumb"
+        description="Ancestor trail for deep hierarchies (manage → game → release → review). Current page uses BreadcrumbPage (not a link) so it matches WAI-ARIA."
+      />
 
       <div className="flex flex-col gap-8">
         <ComponentExample title="Default" description="Chevron separators, link to current page.">

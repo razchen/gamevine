@@ -14,19 +14,23 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { PageHeader } from '@/components/gamevine';
 import { ComponentExample } from '../_components/component-example';
 
 export default function FeedbackPage() {
   return (
     <>
-      <header className="flex flex-col gap-1">
-        <h1 className="text-foreground text-2xl font-semibold tracking-tight">Feedback</h1>
-        <p className="text-muted-foreground text-sm">
-          Inline alerts, modal dialogs, and transient toasts. Dialog and toast content portal to{' '}
-          <code className="font-mono text-xs">document.body</code> — those previews track the live
-          theme.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Primitives"
+        title="Feedback"
+        description={
+          <>
+            Inline alerts, modal dialogs, and transient toasts. Dialog and toast content portal to{' '}
+            <code className="font-mono text-xs">document.body</code> — those previews track the live
+            theme.
+          </>
+        }
+      />
 
       <div className="flex flex-col gap-8">
         <ComponentExample

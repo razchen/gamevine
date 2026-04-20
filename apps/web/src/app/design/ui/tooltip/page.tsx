@@ -1,19 +1,23 @@
 import { CircleHelpIcon, InfoIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { PageHeader } from '@/components/gamevine';
 import { ComponentExample } from '../_components/component-example';
 
 export default function TooltipPage() {
   return (
     <>
-      <header className="flex flex-col gap-1">
-        <h1 className="text-foreground text-2xl font-semibold tracking-tight">Tooltip</h1>
-        <p className="text-muted-foreground text-sm">
-          Hover hints for icon-only controls and constrained labels. Content portals to{' '}
-          <code className="font-mono text-xs">document.body</code>, so previews track the live
-          theme.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Primitives"
+        title="Tooltip"
+        description={
+          <>
+            Hover hints for icon-only controls and constrained labels. Content portals to{' '}
+            <code className="font-mono text-xs">document.body</code>, so previews track the live
+            theme.
+          </>
+        }
+      />
 
       <TooltipProvider>
         <div className="flex flex-col gap-8">

@@ -1,4 +1,3 @@
-import { Badge } from '@/components/ui/badge';
 import {
   Table,
   TableBody,
@@ -9,18 +8,19 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { CreditChip, PageHeader, StatusBadge, type StatusValue } from '@/components/gamevine';
 import { ComponentExample } from '../_components/component-example';
 
 type Release = {
   title: string;
-  status: 'funded' | 'queued' | 'shipped';
+  status: StatusValue;
   credits: number;
 };
 
 const RELEASES: Release[] = [
   { title: 'Daily starter quest', status: 'funded', credits: 3200 },
   { title: 'Ranked leaderboards', status: 'queued', credits: 1800 },
-  { title: 'Spectator mode', status: 'shipped', credits: 4600 },
+  { title: 'Spectator mode', status: 'released', credits: 4600 },
   { title: 'Replay viewer', status: 'queued', credits: 1200 },
 ];
 
@@ -29,13 +29,11 @@ const TOTAL = RELEASES.reduce((sum, r) => sum + r.credits, 0);
 export default function TablePage() {
   return (
     <>
-      <header className="flex flex-col gap-1">
-        <h1 className="text-foreground text-2xl font-semibold tracking-tight">Table</h1>
-        <p className="text-muted-foreground text-sm">
-          Simple data tables. Zebra rows come from the row hover state; status column uses the
-          --success and --warning tokens.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Primitives"
+        title="Table"
+        description="Simple data tables. Zebra rows come from the row hover state; the status column uses the StatusBadge composite and the credits column uses CreditChip so both surfaces stay synced with the shared tokens."
+      />
 
       <div className="flex flex-col gap-8">
         <ComponentExample title="With header, body, footer" description="A typical release roster.">
@@ -54,10 +52,10 @@ export default function TablePage() {
                   <TableRow key={release.title}>
                     <TableCell className="font-medium">{release.title}</TableCell>
                     <TableCell>
-                      <StatusBadge status={release.status} />
+                      <StatusBadge status={release.status} size="sm" />
                     </TableCell>
-                    <TableCell className="text-right font-mono">
-                      {release.credits.toLocaleString()}
+                    <TableCell className="text-right">
+                      <CreditChip value={release.credits} size="sm" tone="soft" suffix={null} />
                     </TableCell>
                   </TableRow>
                 ))}
@@ -65,7 +63,9 @@ export default function TablePage() {
               <TableFooter>
                 <TableRow>
                   <TableCell colSpan={2}>Total</TableCell>
-                  <TableCell className="text-right font-mono">{TOTAL.toLocaleString()}</TableCell>
+                  <TableCell className="text-right">
+                    <CreditChip value={TOTAL} size="sm" hideIcon suffix={null} />
+                  </TableCell>
                 </TableRow>
               </TableFooter>
             </Table>
@@ -94,23 +94,5 @@ export default function TablePage() {
         </ComponentExample>
       </div>
     </>
-  );
-}
-
-function StatusBadge({ status }: { status: Release['status'] }) {
-  if (status === 'funded') {
-    return (
-      <span className="bg-success text-success-foreground inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium">
-        Funded
-      </span>
-    );
-  }
-  if (status === 'shipped') {
-    return <Badge variant="secondary">Shipped</Badge>;
-  }
-  return (
-    <span className="bg-warning text-warning-foreground inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium">
-      Queued
-    </span>
   );
 }

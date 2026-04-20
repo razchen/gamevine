@@ -1,17 +1,21 @@
 import { Separator } from '@/components/ui/separator';
+import { PageHeader } from '@/components/gamevine';
 import { ComponentExample } from '../_components/component-example';
 
 export default function SeparatorPage() {
   return (
     <>
-      <header className="flex flex-col gap-1">
-        <h1 className="text-foreground text-2xl font-semibold tracking-tight">Separator</h1>
-        <p className="text-muted-foreground text-sm">
-          Horizontal or vertical divider tied to the `--border` token. Semantic — avoids the ad-hoc{' '}
-          <code className="font-mono text-xs">&lt;div class=&quot;border-t&quot;&gt;</code>{' '}
-          sprinkled throughout feature code.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Primitives"
+        title="Separator"
+        description={
+          <>
+            Horizontal or vertical divider tied to the --border token. Semantic — avoids the ad-hoc{' '}
+            <code className="font-mono text-xs">&lt;div class=&quot;border-t&quot;&gt;</code>{' '}
+            sprinkled throughout feature code.
+          </>
+        }
+      />
 
       <div className="flex flex-col gap-8">
         <ComponentExample title="Horizontal" description="Default orientation.">

@@ -3,18 +3,17 @@
 import { useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { PageHeader } from '@/components/gamevine';
 import { ComponentExample } from '../_components/component-example';
 
 export default function SwitchPage() {
   return (
     <>
-      <header className="flex flex-col gap-1">
-        <h1 className="text-foreground text-2xl font-semibold tracking-tight">Switch</h1>
-        <p className="text-muted-foreground text-sm">
-          On / off toggle. Preferred over Checkbox for settings where the new state takes effect
-          immediately (notifications, visibility, feature flags).
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Primitives"
+        title="Switch"
+        description="On / off toggle. Preferred over Checkbox for settings where the new state takes effect immediately (notifications, visibility, feature flags)."
+      />
 
       <div className="flex flex-col gap-8">
         <ComponentExample title="States" description="Unchecked, checked, disabled.">

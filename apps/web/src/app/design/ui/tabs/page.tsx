@@ -1,18 +1,22 @@
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { PageHeader } from '@/components/gamevine';
 import { ComponentExample } from '../_components/component-example';
 
 export default function TabsPage() {
   return (
     <>
-      <header className="flex flex-col gap-1">
-        <h1 className="text-foreground text-2xl font-semibold tracking-tight">Tabs</h1>
-        <p className="text-muted-foreground text-sm">
-          Segmented control for switching related views. Two visual variants:{' '}
-          <code className="font-mono text-xs">default</code> (pill) and{' '}
-          <code className="font-mono text-xs">line</code> (underline).
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Primitives"
+        title="Tabs"
+        description={
+          <>
+            Segmented control for switching related views. Two visual variants:{' '}
+            <code className="font-mono text-xs">default</code> (pill) and{' '}
+            <code className="font-mono text-xs">line</code> (underline).
+          </>
+        }
+      />
 
       <div className="flex flex-col gap-8">
         <ComponentExample title="Default" description="Pill style. Active tab lifts off the list.">

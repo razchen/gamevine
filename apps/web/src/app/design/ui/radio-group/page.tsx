@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { PageHeader } from '@/components/gamevine';
 import { ComponentExample } from '../_components/component-example';
 
 const PLANS = [
@@ -14,13 +15,11 @@ const PLANS = [
 export default function RadioGroupPage() {
   return (
     <>
-      <header className="flex flex-col gap-1">
-        <h1 className="text-foreground text-2xl font-semibold tracking-tight">Radio group</h1>
-        <p className="text-muted-foreground text-sm">
-          Single-select where options benefit from being visible. Prefer Select when there are more
-          than ~5 options.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Primitives"
+        title="Radio group"
+        description="Single-select where options benefit from being visible. Prefer Select when there are more than ~5 options."
+      />
 
       <div className="flex flex-col gap-8">
         <ComponentExample title="Vertical" description="Default orientation.">

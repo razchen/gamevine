@@ -10,6 +10,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
+import { PageHeader } from '@/components/gamevine';
 import { ComponentExample } from '../_components/component-example';
 
 const TOTAL = 8;
@@ -17,13 +18,11 @@ const TOTAL = 8;
 export default function PaginationPage() {
   return (
     <>
-      <header className="flex flex-col gap-1">
-        <h1 className="text-foreground text-2xl font-semibold tracking-tight">Pagination</h1>
-        <p className="text-muted-foreground text-sm">
-          Semantic pagination primitive. Consumer owns state — the primitive only provides the
-          presentation + the correct aria wiring.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Primitives"
+        title="Pagination"
+        description="Semantic pagination primitive. Consumer owns state — the primitive only provides the presentation + the correct aria wiring."
+      />
 
       <div className="flex flex-col gap-8">
         <ComponentExample title="Short list" description="Five or fewer pages — show them all.">

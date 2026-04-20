@@ -13,6 +13,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { PageHeader } from '@/components/gamevine';
 import { ComponentExample } from '../_components/component-example';
 
 const SIDES = ['right', 'left', 'top', 'bottom'] as const;
@@ -20,13 +21,11 @@ const SIDES = ['right', 'left', 'top', 'bottom'] as const;
 export default function SheetPage() {
   return (
     <>
-      <header className="flex flex-col gap-1">
-        <h1 className="text-foreground text-2xl font-semibold tracking-tight">Sheet</h1>
-        <p className="text-muted-foreground text-sm">
-          Edge-anchored drawer built on Dialog. Portaled — previews render against the live theme
-          only. Prefer Sheet over Dialog for multi-field edit forms or navigation panels.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Primitives"
+        title="Sheet"
+        description="Edge-anchored drawer built on Dialog. Portaled — previews render against the live theme only. Prefer Sheet over Dialog for multi-field edit forms or navigation panels."
+      />
 
       <div className="flex flex-col gap-8">
         <ComponentExample

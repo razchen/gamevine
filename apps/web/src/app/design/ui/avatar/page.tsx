@@ -7,6 +7,7 @@ import {
   AvatarGroupCount,
   AvatarImage,
 } from '@/components/ui/avatar';
+import { PageHeader } from '@/components/gamevine';
 import { ComponentExample } from '../_components/component-example';
 
 const USERS = [
@@ -35,12 +36,11 @@ const USERS = [
 export default function AvatarPage() {
   return (
     <>
-      <header className="flex flex-col gap-1">
-        <h1 className="text-foreground text-2xl font-semibold tracking-tight">Avatar</h1>
-        <p className="text-muted-foreground text-sm">
-          User image with automatic fallback, presence badge, and stacked groups.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Primitives"
+        title="Avatar"
+        description="User image with automatic fallback, presence badge, and stacked groups."
+      />
 
       <div className="flex flex-col gap-8">
         <ComponentExample title="Sizes" description="sm · default · lg.">

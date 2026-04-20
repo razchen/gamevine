@@ -4,6 +4,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { PageHeader } from '@/components/gamevine';
 import { ComponentExample } from '../_components/component-example';
 
 const FAQS = [
@@ -24,13 +25,11 @@ const FAQS = [
 export default function AccordionPage() {
   return (
     <>
-      <header className="flex flex-col gap-1">
-        <h1 className="text-foreground text-2xl font-semibold tracking-tight">Accordion</h1>
-        <p className="text-muted-foreground text-sm">
-          Progressive disclosure. Prefer over Tabs when the items are semantically similar and the
-          user benefits from scanning headers without a commit.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Primitives"
+        title="Accordion"
+        description="Progressive disclosure. Prefer over Tabs when the items are semantically similar and the user benefits from scanning headers without a commit."
+      />
 
       <div className="flex flex-col gap-8">
         <ComponentExample

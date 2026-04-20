@@ -19,18 +19,22 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { PageHeader } from '@/components/gamevine';
 import { ComponentExample } from '../_components/component-example';
 
 export default function DropdownMenuPage() {
   return (
     <>
-      <header className="flex flex-col gap-1">
-        <h1 className="text-foreground text-2xl font-semibold tracking-tight">Dropdown menu</h1>
-        <p className="text-muted-foreground text-sm">
-          Command menu + row actions. Portaled to <code className="font-mono">document.body</code>,
-          so previews are rendered in the live theme only.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Primitives"
+        title="Dropdown menu"
+        description={
+          <>
+            Command menu + row actions. Portaled to <code className="font-mono">document.body</code>
+            , so previews are rendered in the live theme only.
+          </>
+        }
+      />
 
       <div className="flex flex-col gap-8">
         <ComponentExample

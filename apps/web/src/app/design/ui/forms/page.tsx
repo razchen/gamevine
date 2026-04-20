@@ -2,18 +2,22 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { PageHeader } from '@/components/gamevine';
 import { ComponentExample } from '../_components/component-example';
 
 export default function FormsPage() {
   return (
     <>
-      <header className="flex flex-col gap-1">
-        <h1 className="text-foreground text-2xl font-semibold tracking-tight">Forms</h1>
-        <p className="text-muted-foreground text-sm">
-          Input, Label, Textarea, and a submit row. Validation state uses{' '}
-          <code className="font-mono text-xs">aria-invalid</code>.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Primitives"
+        title="Forms"
+        description={
+          <>
+            Input, Label, Textarea, and a submit row. Validation state uses{' '}
+            <code className="font-mono text-xs">aria-invalid</code>.
+          </>
+        }
+      />
 
       <div className="flex flex-col gap-8">
         <ComponentExample title="Input" description="Default, disabled, and invalid states.">

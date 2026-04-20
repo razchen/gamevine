@@ -1,5 +1,6 @@
 import { CheckIcon, CoinsIcon, TriangleAlertIcon } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { PageHeader } from '@/components/gamevine';
 import { ComponentExample } from '../_components/component-example';
 
 const VARIANTS = ['default', 'secondary', 'destructive', 'outline', 'ghost', 'link'] as const;
@@ -7,13 +8,11 @@ const VARIANTS = ['default', 'secondary', 'destructive', 'outline', 'ghost', 'li
 export default function BadgesPage() {
   return (
     <>
-      <header className="flex flex-col gap-1">
-        <h1 className="text-foreground text-2xl font-semibold tracking-tight">Badges & chips</h1>
-        <p className="text-muted-foreground text-sm">
-          All Badge variants plus raw credits / success / warning chips that exercise the
-          product-specific tokens.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Primitives"
+        title="Badges & chips"
+        description="All Badge variants plus raw credits / success / warning chips that exercise the product-specific tokens."
+      />
 
       <div className="flex flex-col gap-8">
         <ComponentExample title="Badge variants" description="Six variants. Same pill shape.">

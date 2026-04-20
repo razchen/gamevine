@@ -12,17 +12,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { PageHeader } from '@/components/gamevine';
 import { ComponentExample } from '../_components/component-example';
 
 export default function SelectPage() {
   return (
     <>
-      <header className="flex flex-col gap-1">
-        <h1 className="text-foreground text-2xl font-semibold tracking-tight">Select</h1>
-        <p className="text-muted-foreground text-sm">
-          Single-select with grouped items, labels, and two trigger sizes. Content is portaled.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Primitives"
+        title="Select"
+        description="Single-select with grouped items, labels, and two trigger sizes. Content is portaled."
+      />
 
       <div className="flex flex-col gap-8">
         <ComponentExample

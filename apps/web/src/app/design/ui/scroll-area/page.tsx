@@ -1,5 +1,6 @@
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { PageHeader } from '@/components/gamevine';
 import { ComponentExample } from '../_components/component-example';
 
 const TAGS = Array.from({ length: 50 }, (_, i) => `tag-${(i + 1).toString().padStart(2, '0')}`);
@@ -8,13 +9,11 @@ const COLUMNS = Array.from({ length: 20 }, (_, i) => `Column ${i + 1}`);
 export default function ScrollAreaPage() {
   return (
     <>
-      <header className="flex flex-col gap-1">
-        <h1 className="text-foreground text-2xl font-semibold tracking-tight">Scroll area</h1>
-        <p className="text-muted-foreground text-sm">
-          Custom-styled scrollbars tied to the `--border` token. Use when native scrollbars would
-          break the visual rhythm — most containers should still rely on `overflow-auto`.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Primitives"
+        title="Scroll area"
+        description="Custom-styled scrollbars tied to the --border token. Use when native scrollbars would break the visual rhythm — most containers should still rely on overflow-auto."
+      />
 
       <div className="flex flex-col gap-8">
         <ComponentExample

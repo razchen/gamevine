@@ -10,17 +10,17 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { PageHeader } from '@/components/gamevine';
 import { ComponentExample } from '../_components/component-example';
 
 export default function CardsPage() {
   return (
     <>
-      <header className="flex flex-col gap-1">
-        <h1 className="text-foreground text-2xl font-semibold tracking-tight">Cards</h1>
-        <p className="text-muted-foreground text-sm">
-          Elevated surfaces for grouped content. `data-size=&quot;sm&quot;` for denser layouts.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Primitives"
+        title="Cards"
+        description={`Elevated surfaces for grouped content. \`data-size="sm"\` for denser layouts.`}
+      />
 
       <div className="flex flex-col gap-8">
         <ComponentExample

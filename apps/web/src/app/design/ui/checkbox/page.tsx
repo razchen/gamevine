@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { PageHeader } from '@/components/gamevine';
 import { ComponentExample } from '../_components/component-example';
 
 const PERMS = [
@@ -14,13 +15,11 @@ const PERMS = [
 export default function CheckboxPage() {
   return (
     <>
-      <header className="flex flex-col gap-1">
-        <h1 className="text-foreground text-2xl font-semibold tracking-tight">Checkbox</h1>
-        <p className="text-muted-foreground text-sm">
-          Multi-select primitive. Prefer Switch when the change takes effect immediately; use
-          Checkbox inside forms and lists.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Primitives"
+        title="Checkbox"
+        description="Multi-select primitive. Prefer Switch when the change takes effect immediately; use Checkbox inside forms and lists."
+      />
 
       <div className="flex flex-col gap-8">
         <ComponentExample title="States" description="Unchecked · checked · indeterminate.">

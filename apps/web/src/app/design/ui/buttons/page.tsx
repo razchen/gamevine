@@ -1,5 +1,6 @@
 import { ArrowRightIcon, DownloadIcon, Loader2Icon, SparklesIcon, TrashIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { PageHeader } from '@/components/gamevine';
 import { ComponentExample } from '../_components/component-example';
 
 const VARIANTS = ['default', 'outline', 'secondary', 'ghost', 'destructive', 'link'] as const;
@@ -9,13 +10,16 @@ const ICON_SIZES = ['icon-xs', 'icon-sm', 'icon', 'icon-lg'] as const;
 export default function ButtonsPage() {
   return (
     <>
-      <header className="flex flex-col gap-1">
-        <h1 className="text-foreground text-2xl font-semibold tracking-tight">Buttons</h1>
-        <p className="text-muted-foreground text-sm">
-          Six variants × four sizes × icon-only sizes × states. Icons are{' '}
-          <code className="font-mono text-xs">lucide-react</code>.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Primitives"
+        title="Buttons"
+        description={
+          <>
+            Six variants × four sizes × icon-only sizes × states. Icons are{' '}
+            <code className="font-mono text-xs">lucide-react</code>.
+          </>
+        }
+      />
 
       <div className="flex flex-col gap-8">
         <ComponentExample title="Variants" description="All six CTA styles at default size.">
