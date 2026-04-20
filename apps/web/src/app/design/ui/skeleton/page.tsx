@@ -7,8 +7,8 @@ export default function SkeletonPage() {
       <header className="flex flex-col gap-1">
         <h1 className="text-foreground text-2xl font-semibold tracking-tight">Skeleton</h1>
         <p className="text-muted-foreground text-sm">
-          Animated placeholders that preserve final layout. Composed from `--muted` with a pulsing
-          animation.
+          Animated placeholders that preserve final layout. Tinted with `--muted-foreground` at 20%
+          alpha so they stay legible on any surface in both themes.
         </p>
       </header>
 
