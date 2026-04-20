@@ -1,5 +1,5 @@
-import { GameCard } from '../_components/game-card';
-import { MOCK_GAMES } from '../_fixtures/games';
+import { GameCard } from '../../_components/game-card';
+import { MOCK_GAMES } from '../../_fixtures/games';
 
 const SORTS = ['Trending', 'New', 'Most funded this week', 'Most plays'] as const;
 

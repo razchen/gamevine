@@ -1,4 +1,4 @@
-import { Badge, Credits, Progress } from '../_components/primitives';
+import { Badge, Credits, Progress } from '../../_components/primitives';
 
 export default function ComponentsPage() {
   return (

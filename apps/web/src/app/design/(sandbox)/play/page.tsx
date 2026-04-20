@@ -1,6 +1,6 @@
 import { Heart, MessageSquare, Share2, Volume2 } from 'lucide-react';
-import { Badge, Credits } from '../_components/primitives';
-import { FEATURED_GAME } from '../_fixtures/games';
+import { Badge, Credits } from '../../_components/primitives';
+import { FEATURED_GAME } from '../../_fixtures/games';
 
 export default function PlayPage() {
   const game = FEATURED_GAME;

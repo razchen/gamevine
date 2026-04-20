@@ -1,8 +1,8 @@
 import { AlertTriangle } from 'lucide-react';
-import { Badge, Credits } from '../_components/primitives';
-import { MOCK_IDEAS } from '../_fixtures/ideas';
-import { MOCK_RELEASES } from '../_fixtures/releases';
-import { FEATURED_GAME } from '../_fixtures/games';
+import { Badge, Credits } from '../../_components/primitives';
+import { MOCK_IDEAS } from '../../_fixtures/ideas';
+import { MOCK_RELEASES } from '../../_fixtures/releases';
+import { FEATURED_GAME } from '../../_fixtures/games';
 
 export default function ManagePage() {
   const game = FEATURED_GAME;

@@ -1,12 +1,12 @@
-import { LedgerRow } from '../_components/ledger-row';
-import { Badge, Credits, Progress } from '../_components/primitives';
+import { LedgerRow } from '../../_components/ledger-row';
+import { Badge, Credits, Progress } from '../../_components/primitives';
 import {
   CURRENT_BALANCE,
   HELD_BALANCE,
   MOCK_LEDGER,
   MONTHLY_GRANT,
   SUBSCRIPTION_TIER,
-} from '../_fixtures/wallet';
+} from '../../_fixtures/wallet';
 
 export default function WalletPage() {
   const spentThisMonth = 105_000;

@@ -1,4 +1,4 @@
-import { Credits } from '../_components/primitives';
+import { Credits } from '../../_components/primitives';
 
 export default function TypographyPage() {
   return (

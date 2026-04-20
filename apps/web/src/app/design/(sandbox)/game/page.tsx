@@ -1,9 +1,9 @@
 import { PlayCircle } from 'lucide-react';
-import { GameCoverArt } from '../_components/game-card';
-import { Badge, Credits } from '../_components/primitives';
-import { RoadmapItemCard } from '../_components/roadmap-item-card';
-import { FEATURED_GAME } from '../_fixtures/games';
-import { MOCK_ROADMAP } from '../_fixtures/roadmap';
+import { GameCoverArt } from '../../_components/game-card';
+import { Badge, Credits } from '../../_components/primitives';
+import { RoadmapItemCard } from '../../_components/roadmap-item-card';
+import { FEATURED_GAME } from '../../_fixtures/games';
+import { MOCK_ROADMAP } from '../../_fixtures/roadmap';
 
 const nf = new Intl.NumberFormat('en-US');
 

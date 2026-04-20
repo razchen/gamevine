@@ -11,7 +11,7 @@ import {
   SquareStack,
   Type,
 } from 'lucide-react';
-import { THEME_BLURBS, THEME_LABELS, THEMES } from './_components/theme-constants';
+import { THEME_BLURBS, THEME_LABELS, THEMES } from '../_components/theme-constants';
 
 type SurfaceCard = {
   href: Route;
