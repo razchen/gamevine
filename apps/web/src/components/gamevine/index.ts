@@ -1,3 +1,5 @@
+export { AppHeader, type AppHeaderProps } from './app-header';
+export { AppSidebar, type AppSidebarProps } from './app-sidebar';
 export { CreditChip, type CreditChipProps } from './credit-chip';
 export { DataTable, type ColumnDef, type DataTableProps } from './data-table';
 export { EmptyState, type EmptyStateProps } from './empty-state';
@@ -12,3 +14,4 @@ export {
   type StatusBadgeProps,
   type StatusValue,
 } from './status-badge';
+export { ThemeToggle } from './theme-toggle';
