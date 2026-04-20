@@ -2,6 +2,8 @@
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 
+@plugin '@tailwindcss/typography';
+
 @custom-variant dark (&:is(.dark *));
 
 /*
@@ -220,4 +222,47 @@
   html {
     @apply font-sans;
   }
+}
+
+/* -------------------------------------------------------------------------- */
+/* prose-gv — Gamevine retint of `@tailwindcss/typography`.                   */
+/*                                                                            */
+/* Stacks on top of `prose`: `<div class="prose prose-gv dark:prose-invert">`.*/
+/* Repaints typography defaults (links, code, blockquotes, bullets) onto our  */
+/* product tokens (--primary, --muted, --muted-foreground, --border) so       */
+/* future markdown content matches the rest of the app instead of falling     */
+/* back to slate/zinc. Body text keeps the plugin's --tw-prose-body so that   */
+/* `dark:prose-invert` continues to work as the plugin expects.               */
+/* -------------------------------------------------------------------------- */
+
+.prose-gv {
+  --tw-prose-links: var(--primary);
+  --tw-prose-bold: var(--foreground);
+  --tw-prose-headings: var(--foreground);
+  --tw-prose-counters: var(--muted-foreground);
+  --tw-prose-bullets: var(--border);
+  --tw-prose-hr: var(--border);
+  --tw-prose-quotes: var(--foreground);
+  --tw-prose-quote-borders: var(--border);
+  --tw-prose-code: var(--foreground);
+  --tw-prose-pre-code: var(--foreground);
+  --tw-prose-pre-bg: var(--muted);
+  --tw-prose-th-borders: var(--border);
+  --tw-prose-td-borders: var(--border);
+}
+
+.dark .prose-gv {
+  --tw-prose-invert-links: var(--primary);
+  --tw-prose-invert-bold: var(--foreground);
+  --tw-prose-invert-headings: var(--foreground);
+  --tw-prose-invert-counters: var(--muted-foreground);
+  --tw-prose-invert-bullets: var(--border);
+  --tw-prose-invert-hr: var(--border);
+  --tw-prose-invert-quotes: var(--foreground);
+  --tw-prose-invert-quote-borders: var(--border);
+  --tw-prose-invert-code: var(--foreground);
+  --tw-prose-invert-pre-code: var(--foreground);
+  --tw-prose-invert-pre-bg: var(--muted);
+  --tw-prose-invert-th-borders: var(--border);
+  --tw-prose-invert-td-borders: var(--border);
 }
