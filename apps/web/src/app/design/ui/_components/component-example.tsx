@@ -85,17 +85,22 @@ function PreviewPane({
   children: ReactNode;
 }) {
   return (
-    <div
-      className={cn(
-        'border-border flex flex-col overflow-hidden rounded-xl border',
-        tone === 'light' && 'light',
-        tone === 'dark' && 'dark',
-      )}
-    >
-      <div className="bg-muted/60 text-muted-foreground border-border border-b px-3 py-1.5 text-[10px] font-semibold tracking-wider uppercase">
+    <div className="flex flex-col gap-1.5">
+      <span
+        aria-hidden="true"
+        className="text-muted-foreground pl-1 text-[10px] font-medium tracking-[0.14em] uppercase"
+      >
         {label}
-      </div>
-      <div className="bg-background text-foreground flex min-h-20 flex-wrap items-center gap-3 p-4">
+      </span>
+      <div
+        role="group"
+        aria-label={`${label} preview`}
+        className={cn(
+          'border-border/70 bg-background text-foreground flex min-h-24 flex-wrap items-center gap-3 rounded-xl border p-5',
+          tone === 'light' && 'light',
+          tone === 'dark' && 'dark',
+        )}
+      >
         {children}
       </div>
     </div>
